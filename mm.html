@@ -98,7 +98,7 @@ footer .in{display:flex;flex-direction:column;gap:8px;padding-top:10px}
 .chip{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;background:var(--tint);color:var(--brand-ink);border-radius:999px;padding:4px 6px 4px 10px}
 .chip button{border:0;background:transparent;padding:0 4px;color:inherit}
 .err{background:var(--warn-bg);color:var(--warn);font-size:13px;padding:8px 10px;border-radius:10px}
-.sheet{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:flex-end;justify-content:center;z-index:20}
+.sheet{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:flex-end;justify-content:center;z-index:55}
 .sheet>div{background:var(--surface);width:100%;max-width:720px;max-height:85%;border-radius:18px 18px 0 0;padding:16px;padding-bottom:max(16px,env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:10px;overflow:hidden}
 .sheet input[type=search],.sheet input[type=number]{font:inherit;color:var(--fg);background:var(--sunk);border:1px solid var(--line);border-radius:10px;padding:9px 11px}
 .cat{overflow:auto;display:flex;flex-direction:column;gap:6px;min-height:0}
@@ -717,10 +717,72 @@ details.more{margin-top:6px}details.more summary{cursor:pointer;color:var(--bran
   body.ux2 .vhead{grid-template-columns:auto 1fr auto;padding:8px 0}body.ux2 .vhead b{font-size:15px!important;line-height:1.25}
   body.ux2 .vhead button{padding:6px 10px!important;font-size:13px}
 }
+/* ── Поліпшений дизайн, профіль, статуси, візитівки менеджерів, відсутність перекриттів ── */
+body.hasTabs #mmCost,body.introMode #mmCost{display:none!important}
+body.shellOn .card{border:1px solid var(--line);border-top:3px solid var(--brand);border-radius:10px!important;background:var(--surface);box-shadow:0 2px 10px rgba(0,0,0,.03)}
+body.shellOn .card:hover{border-color:var(--brand);box-shadow:0 6px 20px rgba(242,103,58,.08)}
+body.shellOn .comp{border-radius:12px!important;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+.sh-right,.sh-who,.sh-nav,.dr-who,.phead,.mgr-card{min-width:0}
+.prof-wrap{display:flex;flex-direction:column;gap:14px;padding-bottom:18px}
+.prof-hero{display:grid;grid-template-columns:96px 1fr;gap:16px;align-items:center;background:linear-gradient(135deg,var(--surface) 0%,var(--tint) 140%);border:1px solid var(--line);border-top:3px solid var(--brand);border-radius:10px;padding:16px}
+.prof-badges{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.prof-badge{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:700;padding:3px 10px;border-radius:999px;background:var(--tint);color:var(--brand-ink);border:1px solid color-mix(in srgb,var(--brand) 35%,transparent)}
+.prof-badge.tier-start{background:#F4F4F5;color:#3F3F46;border-color:#D4D4D8}
+.prof-badge.tier-master{background:#FFF0EA;color:#B8431C;border-color:#F2673A}
+.prof-badge.tier-pro{background:#EEF2FF;color:#3730A3;border-color:#6366F1}
+.prof-badge.tier-partner{background:#ECFDF5;color:#065F46;border-color:#10B981}
+.prof-badge.tier-staff{background:#2B2B2B;color:#FFFFFF;border-color:#2B2B2B}
+.prof-meta{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13px;color:var(--muted);margin-top:6px}
+.prof-meta span{display:inline-flex;align-items:center;gap:4px;overflow-wrap:anywhere}
+.tier-card{background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--brand);border-radius:10px;padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.tier-top{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.tier-top b{font-size:15px}
+.tier-bar{height:8px;background:var(--sunk);border-radius:999px;overflow:hidden;border:1px solid var(--line)}
+.tier-bar i{display:block;height:100%;background:linear-gradient(90deg,var(--brand-ink),var(--brand));border-radius:999px;transition:width .35s ease}
+.tier-foot{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;font-size:12.5px;color:var(--muted)}
+.tier-levels{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+.tier-lv{border:1px solid var(--line);border-radius:8px;padding:7px 8px;font-size:11.5px;background:var(--sunk);display:flex;flex-direction:column;gap:2px}
+.tier-lv.on{background:var(--tint);border-color:var(--brand);color:var(--brand-ink)}
+.tier-lv b{font-size:12.5px}
+.pstats.pstats-4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:0}
+.pstats.pstats-4>div{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 8px;text-align:center}
+.pstats.pstats-4 b{display:block;font-size:18px;font-weight:800;color:var(--fg);font-variant-numeric:tabular-nums}
+.pstats.pstats-4 span{font-size:11.5px;color:var(--muted)}
+.psec{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.psec-h{font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--brand-ink);margin:0}
+.pgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.pgrid .full{grid-column:1/-1}
+.cform label{display:flex;flex-direction:column;gap:4px;font-size:12.5px;font-weight:600;color:var(--muted)}
+.cform input,.cform select,.cform textarea{font:inherit;font-size:14px;padding:9px 11px;border:1px solid var(--line);border-radius:6px!important;background:var(--sunk);color:var(--fg);width:100%;min-width:0}
+.cform input:focus,.cform select:focus,.cform textarea:focus{border-color:var(--brand);background:var(--surface);outline:none}
+.cform .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:2px}
+.cform .chip2{display:inline-flex;flex-direction:row;align-items:center;gap:6px;border:1px solid var(--line);padding:5px 10px;border-radius:999px;font-size:12.5px;font-weight:600;color:var(--fg);cursor:pointer;background:var(--surface);width:auto}
+.cform .chip2 input{width:auto;margin:0;accent-color:var(--brand-ink)}
+.cform .chip2:has(input:checked){background:var(--tint);border-color:var(--brand);color:var(--brand-ink)}
+.mgr-card{background:var(--surface);border:1px solid var(--line);border-top:3px solid var(--brand);border-radius:10px;padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.mgr-top{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.mgr-ava{width:48px;height:48px;border-radius:50%;background:var(--tint);color:var(--brand-ink);display:grid;place-items:center;font-weight:800;font-size:16px;flex:none;border:1.5px solid var(--brand)}
+.mgr-info{flex:1;min-width:0}
+.mgr-info b{display:block;font-size:16px}
+.mgr-info span{display:block;font-size:12.5px;color:var(--muted)}
+.mgr-details{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12.5px;color:var(--muted)}
+.mgr-actions{display:flex;flex-wrap:wrap;gap:8px}
+.mgr-actions a{text-decoration:none;font-size:13px;padding:7px 12px;border-radius:6px!important;display:inline-flex;align-items:center;gap:5px}
+.pass-card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px;display:flex;flex-direction:column;gap:8px}
+.pass-card input{font:inherit;font-size:14px;padding:9px 11px;border:1px solid var(--line);border-radius:6px!important;background:var(--sunk);color:var(--fg);min-width:0}
+@media (max-width:640px){
+  .prof-hero{grid-template-columns:1fr;text-align:center;justify-items:center}
+  .prof-badges,.prof-meta{justify-content:center}
+  .pstats.pstats-4{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .tier-levels{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .pgrid{grid-template-columns:1fr}
+  .cform input,.cform select,.cform textarea,.pass-card input{font-size:16px}
+  .mgr-actions a{flex:1 1 calc(50% - 4px);justify-content:center}
+}
 </style>
 </head>
 <body>
-<div id="mmCost" style="position:fixed;left:50%;bottom:4px;transform:translateX(-50%);z-index:999;font:11px/1.3 'Open Sans',sans-serif;background:#fff3cd;color:#664d03;border:1px solid #ffe69c;border-radius:8px;padding:3px 10px;white-space:nowrap;max-width:96vw;overflow:hidden;text-overflow:ellipsis">Тест: MiniMax M3.1 Flash</div>
+<div id="mmCost" style="position:fixed;left:50%;bottom:4px;transform:translateX(-50%);z-index:45;pointer-events:none;font:11px/1.3 'Open Sans',sans-serif;background:#fff3cd;color:#664d03;border:1px solid #ffe69c;border-radius:8px;padding:3px 10px;white-space:nowrap;max-width:96vw;overflow:hidden;text-overflow:ellipsis">Тест: MiniMax M3.1 Flash</div>
 
 <header>
   <div class="gut hrow"><div class="in">
@@ -831,7 +893,54 @@ const $ = id => document.getElementById(id);
 // ТЕСТ: модель MiniMax M3.1 Flash. Ключ MiniMax → напряму api.minimax.io; ключ OpenRouter (sk-or-…) → через openrouter.ai.
 // ── Автооновлення: одне постійне посилання без ?v=. Сторінка сама перевіряє, чи на GitHub не вийшла новіша версія,
 // і тихо перезавантажується (адреса в рядку браузера лишається та сама). При кожному оновленні міняти APP_VER.
-const APP_VER = '2026-11-14.9';
+const APP_VER = '2026-11-15.1';
+const HP_SHOWROOM = { schedule:'Пн–Пт 09:00–18:00', address:'Львів, вул. Зелена, 238, корпус «В»' };
+const HP_MANAGERS = [
+  { id:'vlad', name:'Владислав Гірняк', role:'Менеджер', phones:['+38 (067) 534 59 41','+38 (063) 334 36 54'], email:'HirniakVO@hot-point.com.ua', tg:'https://t.me/Manaaggerr03', viber:'+380675345941', url:'https://youneedtoworkwithme.github.io/vlad/' },
+  { id:'taras', name:'Тарас-Борис Левицький', role:'Директор магазину', phones:['+38 (063) 334 37 25','+38 (067) 118 97 00'], email:'LevytskyiTI@hot-point.com.ua', tg:'https://t.me/Tarashotpoint', viber:'+380633343725', url:'https://youneedtoworkwithme.github.io/taras/', cashflow:'https://youneedtoworkwithme.github.io/taras/cashflow/' },
+  { id:'rostyslav', name:'Ростислав Медвідь', role:'Менеджер', phones:['+38 (063) 334 36 02'], email:'MedvidRA@hot-point.com.ua', tg:'https://t.me/+380633343602', viber:'+380633343602', url:'https://youneedtoworkwithme.github.io/rostyslav/' },
+  { id:'yurii', name:'Юрій Паславський', role:'Менеджер', phones:['+38 (097) 202 54 55'], email:'PaslavskyiYI@hot-point.com.ua', tg:'https://t.me/Paslavski', viber:'+380972025455', url:'https://youneedtoworkwithme.github.io/yurii/' },
+  { id:'olena', name:'Олена Павличенко', role:'Менеджер', phones:['+38 (063) 269 11 68'], email:'PavlychenkoOA@hot-point.com.ua', tg:'https://t.me/Olena_HotPoint', viber:'+380632691168', url:'https://youneedtoworkwithme.github.io/olena/' },
+  { id:'nataliia', name:'Наталія Корнійко', role:'Менеджер', phones:['+38 (063) 798 99 30'], email:'korniikons@hot-point.com.ua', tg:'https://t.me/gt31natali', viber:'+380637989930', url:'https://youneedtoworkwithme.github.io/nataliia/' }
+];
+const HP_TIERS = [
+  { id:'start', name:'Старт', min:0, maxProjects:2, cls:'tier-start', desc:'Базовий рівень для перших підборів' },
+  { id:'master', name:'Майстер', min:30000, maxProjects:5, cls:'tier-master', desc:'Від 30 000 грн закупівель/розрахунків' },
+  { id:'pro', name:'Профі', min:150000, maxProjects:15, cls:'tier-pro', desc:'Від 150 000 грн — розширений ліміт об’єктів' },
+  { id:'partner', name:'Партнер', min:500000, maxProjects:Infinity, cls:'tier-partner', desc:'Від 500 000 грн — безлімітна кількість проєктів' }
+];
+function hpNormPh(p){ return String(p || '').replace(/\D/g, '').slice(-9); }
+function hpFindManager(q){
+  if(!q) return null;
+  const s = typeof q === 'string' ? { name:q, id:q } : q;
+  const em = (s.email || '').toLowerCase().trim(), nm = (s.name || '').toLowerCase().trim(), id = (s.id || s.card || '').toLowerCase().trim();
+  const ph = hpNormPh(s.phone || (Array.isArray(s.phones) ? s.phones[0] : ''));
+  return HP_MANAGERS.find(m =>
+    (id && (m.id === id || (m.url && m.url.toLowerCase().includes('/' + id + '/')))) ||
+    (em && m.email.toLowerCase() === em) ||
+    (ph && ph.length >= 9 && m.phones.some(mp => hpNormPh(mp) === ph)) ||
+    (nm && (m.name.toLowerCase() === nm || nm.includes(m.name.split(' ')[0].toLowerCase())))
+  ) || null;
+}
+function hpCalcTier(volumeUah){
+  const v = Math.max(0, Number(volumeUah) || 0);
+  let idx = 0;
+  for(let i = HP_TIERS.length - 1; i >= 0; i--){ if(v >= HP_TIERS[i].min){ idx = i; break; } }
+  const cur = HP_TIERS[idx], next = HP_TIERS[idx + 1] || null;
+  const pct = next ? Math.min(100, Math.round((v - cur.min) / (next.min - cur.min) * 100)) : 100;
+  return { cur, next, pct, remain: next ? Math.max(0, next.min - v) : 0, idx };
+}
+function hpProfileKey(cid){
+  const tok = (typeof apiKey === 'function' ? apiKey() : '') || (ls.get('hpuser')?.token || '');
+  return 'hpprof:' + (tok ? tok.slice(0, 12) : 'anon') + ':' + (cid || 'self');
+}
+function hpGetLocalProfile(cid){ try{ return ls.get(hpProfileKey(cid)) || {}; }catch{ return {}; } }
+function hpSaveLocalProfile(cid, patch){
+  const k = hpProfileKey(cid), cur = hpGetLocalProfile(cid);
+  const next = { ...cur, ...patch, updatedAt: Date.now() };
+  try{ ls.set(k, next); }catch{}
+  return next;
+}
 (() => {
   const ss = { get(k){ try{ return sessionStorage.getItem(k); }catch{ return null; } }, set(k,v){ try{ sessionStorage.setItem(k,v); }catch{} } };
   if(/[?&]r=\d/.test(location.search)) history.replaceState(null, '', location.pathname + location.hash);
@@ -2731,34 +2840,225 @@ function avatarSVG(name, size = 96){
 async function shrinkAvatar(file){ const img = await createImageBitmap(file), s = 160, k = Math.max(s / img.width, s / img.height), c = document.createElement('canvas'); c.width = s; c.height = s;
   c.getContext('2d').drawImage(img, (s - img.width * k) / 2, (s - img.height * k) / 2, img.width * k, img.height * k); return c.toDataURL('image/jpeg', 0.82); }
 
+function hpRenderMgrCard(mg, title, isOwn){
+  if(!mg) return '';
+  const dir = HP_MANAGERS.find(m => m.id === (mg.id || '') || (mg.name && m.name === mg.name) || (mg.email && m.email === mg.email)) || hpFindManager(mg);
+  const phones = dir?.phones || (mg.phone ? [mg.phone] : []);
+  const email = dir?.email || mg.email || '';
+  const tg = dir?.tg || mg.tg || '';
+  const viber = dir?.viber || (phones[0] ? phones[0].replace(/[^\d+]/g, '') : '');
+  const url = dir?.url || mg.url || '';
+  const role = dir?.role || mg.role || 'Менеджер «Гаряча Точка»';
+  const name = dir?.name || mg.name || 'Менеджер';
+  const init = name.split(/\s+/).slice(0, 2).map(w => w[0] || '').join('').toUpperCase();
+  return `<div class="sgrp">${esc(title)}</div>
+    <div class="mgr-card">
+      <div class="mgr-top">
+        <div class="mgr-ava">${esc(init || 'ГТ')}</div>
+        <div class="mgr-info"><b>${esc(name)}</b><span>${esc(role)} · ${esc(HP_SHOWROOM.schedule)}</span></div>
+      </div>
+      <div class="mgr-details">
+        ${phones.map(p => `<span>📞 ${esc(p)}</span>`).join('')}
+        ${email ? `<span>✉️ ${esc(email)}</span>` : ''}
+        <span>📍 ${esc(HP_SHOWROOM.address)}</span>
+      </div>
+      <div class="mgr-actions">
+        ${phones[0] ? `<a class="btn" href="tel:${esc(phones[0].replace(/[^\d+]/g,''))}">Подзвонити</a>` : ''}
+        ${viber ? `<a class="btn" href="viber://chat?number=${encodeURIComponent(viber)}">Viber</a>` : ''}
+        ${tg ? `<a class="btn" href="${esc(tg)}" target="_blank" rel="noopener">Telegram</a>` : ''}
+        ${email ? `<a href="mailto:${esc(email)}">Пошта</a>` : ''}
+        ${url ? `<a href="${esc(url)}" target="_blank" rel="noopener">${isOwn ? 'Моя 3D-візитівка ↗' : 'Візитівка ↗'}</a>` : ''}
+        ${isOwn && dir?.cashflow ? `<a href="${esc(dir.cashflow)}" target="_blank" rel="noopener">💸 Кешфлоу ↗</a>` : ''}
+      </div>
+    </div>`;
+}
+
 async function openProfile(cidArg){
   S.tab = 'profile';
   const box = viewOpen('<div class="small">Завантажую профіль…</div>');
   const cid = cidArg || S.viewAs?.id || S.ctx.client?.id || S.me?.client?.id || '';
-  let r; try{ r = await API('profile', { client_id:cid }); S.lastProfile = r; }catch(e){ box.innerHTML = `<div class="err">${esc(e.message)}</div>`; return; }
-  const c = r.client, st = r.stats, mg = r.manager || S.me?.manager;
-  const months = Object.entries(st.byMonth).sort().slice(-6), max = Math.max(1, ...months.map(([, v]) => v.sum));
-  const ava = r.avatar ? `<img src="${r.avatar}" alt="Фото">` : avatarSVG(c.name);
-  box.innerHTML = `<div class="vhead"><span></span><b>${cidArg || S.viewAs ? 'Профіль клієнта' : 'Мій профіль'}</b><button class="ghost" data-close>Закрити</button></div>
-    <div class="phead"><label class="pava" title="Змінити фото">${ava}<input type="file" accept="image/*" id="pAva" hidden><span>Змінити фото</span></label>
-      <div><b class="pname">${esc(c.name)}</b><div class="small">${esc(c.phone)}${c.email ? ' · ' + esc(c.email) : ''}</div>${c.type ? `<div class="small">${esc(c.type)}</div>` : ''}${r.avatar ? '<button class="ghost sm" id="pAvaDel">Прибрати фото</button>' : ''}</div></div>
-    <div class="pstats"><div><b>${st.calcs}</b><span>розрахунків</span></div><div><b>${st.confirmed}</b><span>підтверджено</span></div><div><b>${fmt(Math.round(st.sum))}</b><span>грн на суму</span></div><div><b>${st.first ? new Date(st.first).toLocaleDateString('uk-UA', {month:'short', year:'2-digit'}) : '—'}</b><span>з нами з</span></div></div>
-    ${months.length ? `<div class="pbars">${months.map(([m, v]) => `<div title="${m}: ${v.calcs} розрах., ${fmt(Math.round(v.sum))} грн"><i style="height:${Math.max(4, v.sum / max * 64)}px"></i><span>${m.slice(5)}.${m.slice(2,4)}</span></div>`).join('')}</div><div class="small" style="text-align:center">Сума розрахунків по місяцях (останні ${months.length})</div>` : ''}
-    <form class="cform" id="pForm">
-      <label>ПІБ<input name="name" value="${esc(c.name)}"></label>
-      <label>Дата народження<input name="birth" type="date" value="${esc(c.birth || '')}"></label>
-      <label>Хто Ви<select name="type">${['', 'Майстер-сантехнік', 'Бригада / монтажна компанія', 'Будівельна фірма / забудовник', 'Дизайнер / архітектор', 'Приватний клієнт (свій ремонт)'].map(x => `<option ${x === c.type ? 'selected' : ''}>${x}</option>`).join('')}</select></label>
-      <label>Вподобання: виробники, системи, деталі (ШІ враховує в кожному підборі)<textarea name="prefs" rows="3" placeholder="напр.: пайка Ekoplastik; PUSH — RAFTEC; крани PLM; чистова — Venta, чорний матовий">${esc(c.prefs || '')}</textarea></label>
-      <label>Про мене (анкета)<textarea name="survey" rows="3">${esc(c.survey || '')}</textarea></label>
-      <div class="err" id="pErr" hidden></div><button class="btn">Зберегти</button><span class="small" id="pOk"></span>
-    </form>
-    ${mg ? `<div class="sgrp">Ваш менеджер</div><div class="ccard mcard"><b>${esc(mg.name)}</b><div class="row"><a class="btn" href="tel:${esc(mg.phone)}">Подзвонити</a><a class="btn" href="viber://chat?number=${encodeURIComponent(String(mg.phone).replace(/[^\d+]/g,''))}">Viber</a>${mg.url ? `<a class="btn" href="${mg.url}" target="_blank" rel="noopener">Візитівка ↗</a>` : ''}</div></div>` : ''}`;
-  const save = async (p, okText) => { try{ await API('profile_save', { client_id:c.id, profile:p }); $('pOk').textContent = okText || 'Збережено ✓'; if(S.viewAs) Object.assign(S.viewAs, p); }catch(e){ $('pErr').textContent = e.message; $('pErr').hidden = false; } };
-  $('pAva').onchange = async e => { const f = e.target.files[0]; if(!f) return; const d = await shrinkAvatar(f); box.querySelector('.pava').firstElementChild.outerHTML = `<img src="${d}" alt="Фото">`; await save({ avatar:d }, 'Фото збережено ✓'); };
-  const del = $('pAvaDel'); if(del) del.onclick = async () => { await save({ avatar:'' }); openProfile(); };
-  $('pForm').onsubmit = async e => { e.preventDefault(); const f = e.target; $('pErr').hidden = true; $('pOk').textContent = 'Зберігаю…';
-    await save({ name:f.name.value, birth:f.birth.value, type:f.type.value, prefs:f.prefs.value, survey:f.survey.value });
-    if(S.ctx.client && S.ctx.client.id === c.id) S.ctx.client.prefs = f.prefs.value; };
+  const viewingSelfStaff = !cid && !isClient() && !S.viewAs;
+  const localKey = cid || (viewingSelfStaff ? 'staff:' + (S.me?.email || S.me?.phone || S.me?.name || 'self') : 'self');
+  const loc = hpGetLocalProfile(localKey);
+  let r = null, objCount = 0;
+  try{
+    const [pr, ob] = await Promise.all([
+      API('profile', { client_id: cid }).catch(() => null),
+      API('objects', { client_id: cid || '' }).catch(() => ({ objects: [] }))
+    ]);
+    r = pr; objCount = (ob?.objects || []).length;
+  }catch{}
+  if(!r && !S.me){ box.innerHTML = '<div class="err">Не вдалося завантажити профіль</div>'; return; }
+  S.lastProfile = r || { client: {}, stats: { calcs:0, confirmed:0, sum:0, buySum:0, byMonth:{} } };
+  const rawC = r?.client || {};
+  const uCache = ls.get('hpuser') || {};
+  const staffMatch = viewingSelfStaff ? hpFindManager({ name: S.me?.name, email: S.me?.email, phone: S.me?.phone || rawC.phone, card: hpCard() }) : null;
+  const c = {
+    id: rawC.id || cid || '',
+    name: loc.name || rawC.name || staffMatch?.name || S.me?.name || uCache.name || '',
+    phone: loc.phone || rawC.phone || staffMatch?.phones?.[0] || S.me?.phone || '',
+    email: loc.email || rawC.email || staffMatch?.email || S.me?.email || '',
+    birth: loc.birth || rawC.birth || '',
+    type: loc.type || rawC.type || (viewingSelfStaff ? (staffMatch?.role || roleLbl(S.me?.role)) : ''),
+    prefs: loc.prefs !== undefined ? loc.prefs : (rawC.prefs || ''),
+    survey: loc.survey !== undefined ? loc.survey : (typeof rawC.survey === 'string' ? rawC.survey : ''),
+    district: loc.district || rawC.district || rawC.survey?.district || '',
+    brands: loc.brands || rawC.brands || rawC.survey?.brands || '',
+    segment: loc.segment || rawC.segment || rawC.survey?.segment || '',
+    pay: loc.pay || rawC.pay || rawC.survey?.pay || '',
+    volume: loc.volume || rawC.volume || rawC.survey?.volume || '',
+    channel: loc.channel || rawC.channel || rawC.survey?.channel || '',
+    works: loc.works || rawC.works || rawC.survey?.works || [],
+    systems: loc.systems || rawC.systems || rawC.survey?.systems || []
+  };
+  const st = r?.stats || { calcs:0, confirmed:0, sum:0, byMonth:{} };
+  const calcSum = Number(st.sum || 0);
+  const buySum = Number(st.buySum ?? st.confirmedSum ?? (st.confirmed && st.calcs ? Math.round(calcSum * (st.confirmed / Math.max(1, st.calcs))) : 0));
+  const avgCheck = st.calcs ? Math.round(calcSum / st.calcs) : 0;
+  const tierInfo = hpCalcTier(Math.max(calcSum, buySum));
+  const isStaffSelf = viewingSelfStaff;
+  const mgRaw = r?.manager || S.me?.manager || (hpCard() ? hpFindManager(hpCard()) : null);
+  const mg = isStaffSelf ? (staffMatch || { name: c.name, role: roleLbl(S.me?.role), phone: c.phone, email: c.email }) : hpFindManager(mgRaw) || mgRaw;
+  const months = Object.entries(st.byMonth || {}).sort().slice(-6), max = Math.max(1, ...months.map(([, v]) => v.sum));
+  const avaSrc = r?.avatar || loc.avatar || (!cidArg && !S.viewAs ? S.myAva : '') || '';
+  const ava = avaSrc ? `<img src="${avaSrc}" alt="Фото">` : avatarSVG(c.name || 'HP');
+  const WORK_OPTS = ['Водопостачання','Каналізація','Опалення','Тепла підлога','Котельня / бойлерна','Чистова сантехніка','Електрика'];
+  const SYS_OPTS = ['PPR пайка','PUSH (натяжна)','Металопласт прес','Нержавійка прес','Мідь'];
+  const TYPE_OPTS = ['', 'Майстер-сантехнік', 'Бригада / монтажна компанія', 'Будівельна фірма / забудовник', 'Дизайнер / архітектор', 'Приватний клієнт (свій ремонт)'];
+  const titleText = cidArg || S.viewAs ? 'Профіль клієнта' : 'Мій профіль';
+  const maxProjLabel = tierInfo.cur.maxProjects === Infinity ? 'Безліміт' : `${tierInfo.cur.maxProjects}`;
+
+  box.innerHTML = `<div class="vhead"><span></span><b>${titleText}</b><button class="ghost" data-close>Закрити</button></div>
+    <div class="prof-wrap">
+      <div class="prof-hero">
+        <label class="pava" title="Змінити фото">${ava}<input type="file" accept="image/*" id="pAva" hidden><span>Змінити фото</span></label>
+        <div>
+          <b class="pname">${esc(c.name || 'Користувач')}</b>
+          <div class="prof-badges">
+            ${isStaffSelf ? `<span class="prof-badge tier-staff">${esc(staffMatch?.role || roleLbl(S.me?.role))}</span>` : `<span class="prof-badge ${tierInfo.cur.cls}">Статус: ${esc(tierInfo.cur.name)}</span>`}
+            ${c.type && !isStaffSelf ? `<span class="prof-badge">${esc(c.type)}</span>` : ''}
+          </div>
+          <div class="prof-meta">
+            ${c.phone ? `<span>📞 ${esc(c.phone)}</span>` : ''}
+            ${c.email ? `<span>✉️ ${esc(c.email)}</span>` : ''}
+            ${c.district ? `<span>📍 ${esc(c.district)}</span>` : ''}
+            ${c.birth ? `<span>🎂 ${esc(c.birth)}</span>` : ''}
+          </div>
+          ${avaSrc ? '<button class="ghost sm" id="pAvaDel" style="margin-top:6px">Прибрати фото</button>' : ''}
+        </div>
+      </div>
+
+      <div class="tier-card">
+        <div class="tier-top">
+          <b>${isStaffSelf ? 'Доступ працівника Hotpoint' : `Статус клієнта: ${esc(tierInfo.cur.name)}`}</b>
+          <span class="small">${isStaffSelf ? 'Усі об’єкти та клієнти — без обмежень' : `Ліміт проєктів: <b>${objCount} / ${maxProjLabel}</b>`}</span>
+        </div>
+        ${!isStaffSelf ? `
+          <div class="tier-bar"><i style="width:${tierInfo.pct}%"></i></div>
+          <div class="tier-foot">
+            <span>${esc(tierInfo.cur.desc)}</span>
+            <span>${tierInfo.next ? `До «${esc(tierInfo.next.name)}»: ще ${fmt(Math.round(tierInfo.remain))} грн` : 'Максимальний статус досягнуто ✓'}</span>
+          </div>
+          <div class="tier-levels">
+            ${HP_TIERS.map(t => `<div class="tier-lv ${t.id === tierInfo.cur.id ? 'on' : ''}"><b>${esc(t.name)}</b><span>${t.maxProjects === Infinity ? 'Безліміт проєктів' : `до ${t.maxProjects} проєктів`}</span></div>`).join('')}
+          </div>
+        ` : `<div class="small">Роль: <b>${esc(roleLbl(S.me?.role))}</b> · Активних об’єктів у роботі: <b>${objCount}</b></div>`}
+      </div>
+
+      <div class="pstats pstats-4">
+        <div><b>${st.calcs || 0}</b><span>розрахунків</span></div>
+        <div><b>${st.confirmed || 0}</b><span>підтверджено</span></div>
+        <div><b>${fmt(Math.round(calcSum))}</b><span>грн розрахунків</span></div>
+        <div><b>${fmt(Math.round(buySum))}</b><span>грн закупівель${avgCheck ? ` · сер. ${fmt(avgCheck)}` : ''}</span></div>
+      </div>
+
+      ${months.length ? `<div class="psec"><div class="pbars">${months.map(([m, v]) => `<div title="${m}: ${v.calcs} розрах., ${fmt(Math.round(v.sum))} грн"><i style="height:${Math.max(4, v.sum / max * 64)}px"></i><span>${m.slice(5)}.${m.slice(2,4)}</span></div>`).join('')}</div><div class="small" style="text-align:center">Динаміка розрахунків по місяцях (останні ${months.length})</div></div>` : ''}
+
+      <form class="cform psec" id="pForm">
+        <div class="psec-h">Особисті та робочі дані</div>
+        <div class="pgrid">
+          <label>ПІБ<input name="name" value="${esc(c.name)}"></label>
+          <label>Телефон<input name="phone" value="${esc(c.phone)}" placeholder="+380..."></label>
+          <label>Пошта<input name="email" type="email" value="${esc(c.email)}"></label>
+          <label>Дата народження<input name="birth" type="date" value="${esc(c.birth)}"></label>
+          <label>Місто / район об’єктів<input name="district" value="${esc(c.district)}" placeholder="напр.: Львів, Сихів"></label>
+          <label>Зручний зв’язок<select name="channel">${['','Viber','Telegram','Дзвінок'].map(x => `<option ${x === c.channel ? 'selected' : ''}>${x || '—'}</option>`).join('')}</select></label>
+          ${!isStaffSelf ? `<label>Хто Ви<select name="type">${TYPE_OPTS.map(x => `<option value="${esc(x)}" ${x === c.type ? 'selected' : ''}>${x || '—'}</option>`).join('')}</select></label>` : `<label>Посада<input name="type" value="${esc(c.type)}" readonly></label>`}
+          <label>Сегмент<select name="segment">${['','Бюджет','Середній','Преміум','Різний — під клієнта'].map(x => `<option value="${esc(x)}" ${x === c.segment ? 'selected' : ''}>${x || '—'}</option>`).join('')}</select></label>
+          <label>Оплата<select name="pay">${['','Готівка / картка','Безготівка ФОП','Безготівка ТОВ (з ПДВ)'].map(x => `<option value="${esc(x)}" ${x === c.pay ? 'selected' : ''}>${x || '—'}</option>`).join('')}</select></label>
+          <label>Об’єктів на місяць<select name="volume">${['','1','2–3','4–10','10+'].map(x => `<option value="${esc(x)}" ${x === c.volume ? 'selected' : ''}>${x || '—'}</option>`).join('')}</select></label>
+          <label class="full">Улюблені бренди<input name="brands" value="${esc(c.brands)}" placeholder="напр.: Ekoplastik, RAFTEC, Grohe"></label>
+          <div class="full"><span class="lbl">Напрямки робіт</span><div class="chips">${WORK_OPTS.map(x => `<label class="chip2"><input type="checkbox" name="works" value="${esc(x)}" ${(c.works||[]).includes(x) ? 'checked' : ''}>${esc(x)}</label>`).join('')}</div></div>
+          <div class="full"><span class="lbl">Системи</span><div class="chips">${SYS_OPTS.map(x => `<label class="chip2"><input type="checkbox" name="systems" value="${esc(x)}" ${(c.systems||[]).includes(x) ? 'checked' : ''}>${esc(x)}</label>`).join('')}</div></div>
+          <label class="full">Вподобання для ШІ (бренди, системи, деталі підбору)<textarea name="prefs" rows="3" placeholder="напр.: пайка Ekoplastik; PUSH — RAFTEC; крани PLM; чистова — Venta">${esc(c.prefs)}</textarea></label>
+          <label class="full">Нотатка / про себе<textarea name="survey" rows="2">${esc(c.survey)}</textarea></label>
+        </div>
+        <div class="err" id="pErr" hidden></div>
+        <div class="row"><button class="btn">Зберегти дані</button><span class="small" id="pOk"></span></div>
+      </form>
+
+      <div class="pass-card">
+        <div class="psec-h">Безпека та пароль</div>
+        ${r?.password !== undefined && !isClient() ? `<div class="small">Пароль клієнта: <code class="pwd">${esc(r.password)}</code> — продиктуйте клієнту, якщо забув</div>` : ''}
+        <div class="row"><input id="pNew" type="password" placeholder="Новий пароль (мін. 4 символи)" style="flex:1"><button type="button" class="ghost sm" id="pEye" title="Показати/сховати">👁</button><button type="button" id="pSet" class="btn sm">Змінити пароль</button></div>
+        ${isClient() ? PASS_WARN : ''}<span class="small" id="pPassOk"></span>
+      </div>
+
+      ${hpRenderMgrCard(mg, isStaffSelf ? 'Моя візитівка Hotpoint' : 'Ваш персональний менеджер', isStaffSelf)}
+    </div>`;
+
+  const save = async (p, okText) => {
+    hpSaveLocalProfile(localKey, p);
+    try{
+      if(c.id || !isStaffSelf) await API('profile_save', { client_id: c.id, profile: p });
+      $('pOk').textContent = okText || 'Збережено ✓';
+      if(S.viewAs) Object.assign(S.viewAs, p);
+      if(!cidArg && !S.viewAs && p.name){
+        if(S.me) S.me.name = p.name;
+        const u = ls.get('hpuser') || {}; ls.set('hpuser', { ...u, name: p.name });
+        shellRender();
+      }
+    }catch(e){
+      if(isStaffSelf){ $('pOk').textContent = 'Збережено локально ✓'; }
+      else{ $('pErr').textContent = e.message; $('pErr').hidden = false; }
+    }
+  };
+  $('pAva').onchange = async e => {
+    const f = e.target.files[0]; if(!f) return;
+    const d = await shrinkAvatar(f);
+    box.querySelector('.pava').firstElementChild.outerHTML = `<img src="${d}" alt="Фото">`;
+    if(!cidArg && !S.viewAs) S.myAva = d;
+    await save({ avatar: d }, 'Фото збережено ✓');
+    shellRender();
+  };
+  const del = $('pAvaDel'); if(del) del.onclick = async () => {
+    if(!cidArg && !S.viewAs) S.myAva = '';
+    await save({ avatar: '' }); openProfile(cidArg);
+  };
+  $('pForm').onsubmit = async e => {
+    e.preventDefault(); const f = e.target; $('pErr').hidden = true; $('pOk').textContent = 'Зберігаю…';
+    const fd = new FormData(f);
+    const works = fd.getAll('works'), systems = fd.getAll('systems');
+    const payload = {
+      name: f.name.value.trim(), phone: f.phone.value.trim(), email: f.email.value.trim(), birth: f.birth.value,
+      district: f.district.value.trim(), channel: f.channel.value === '—' ? '' : f.channel.value,
+      type: f.type.value, segment: f.segment.value, pay: f.pay.value, volume: f.volume.value,
+      brands: f.brands.value.trim(), works, systems, prefs: f.prefs.value.trim(), survey: f.survey.value.trim()
+    };
+    await save(payload);
+    if(S.ctx.client && S.ctx.client.id === c.id) S.ctx.client.prefs = payload.prefs;
+  };
+  $('pEye').onclick = () => { const inp = $('pNew'); inp.type = inp.type === 'password' ? 'text' : 'password'; };
+  $('pSet').onclick = async () => {
+    const v = $('pNew').value.trim();
+    if(v.length < 4){ $('pPassOk').textContent = 'Щонайменше 4 символи'; return; }
+    $('pPassOk').textContent = 'Зберігаю…';
+    try{
+      await API('profile_save', { client_id: c.id || r?.client?.id, profile: { password: v } });
+      $('pPassOk').textContent = 'Пароль змінено ✓'; $('pNew').value = '';
+      const pwdEl = box.querySelector('.pwd'); if(pwdEl) pwdEl.textContent = v;
+    }catch(e){ $('pPassOk').textContent = e.message; }
+  };
 }
 openProfile = tracked(openProfile);
 
@@ -2870,28 +3170,18 @@ mmGate = function(mode){
       if(f.password.value.length < 4) throw new Error('Пароль — щонайменше 4 символи');
       const fd = new FormData(f), survey = { kind:fd.get('kind'), works:fd.getAll('works'), systems:fd.getAll('systems'), brands:fd.get('brands'), segment:fd.get('segment'), pay:fd.get('pay'), volume:fd.get('volume'), district:fd.get('district'), channel:fd.get('channel') };
       const prefs = [survey.systems.length ? 'Системи: ' + survey.systems.join(', ') : '', survey.brands ? 'Бренди: ' + survey.brands : '', survey.segment ? 'Сегмент: ' + survey.segment : ''].filter(Boolean).join('; ');
-      const w = await proxyCall({ action:'register', phone:ph, name:f.name.value, email:f.email.value, birth:f.birth.value, password:f.password.value, card:hpCard(), profile:{ type:survey.kind, survey, prefs } });
+      const fullProfile = { name:f.name.value.trim(), email:f.email.value.trim(), phone:ph, birth:f.birth.value, type:survey.kind, works:survey.works, systems:survey.systems, brands:survey.brands, segment:survey.segment, pay:survey.pay, volume:survey.volume, district:survey.district, channel:survey.channel, prefs, survey:[survey.kind, survey.works.join(', '), survey.district, survey.channel ? 'Зв’язок: '+survey.channel : ''].filter(Boolean).join(' · ') };
+      const w = await proxyCall({ action:'register', phone:ph, name:f.name.value, email:f.email.value, birth:f.birth.value, password:f.password.value, card:hpCard(), profile:{ type:survey.kind, survey, prefs, ...fullProfile } });
       if(w.status === 409 && /телефон/i.test(w.data?.error?.message || '')) return loginStep(ph);
       if(w.status !== 200) throw new Error(w.data?.error?.message || 'Не вдалося зареєструватися');
       done(w.data);
+      const cidNew = w.data?.client?.id || w.data?.user?.client_id || 'self';
+      hpSaveLocalProfile(cidNew, fullProfile);
+      hpSaveLocalProfile('self', fullProfile);
     }, 'input[name=name]');
   }
   phoneStep('');
 };
-
-// ── Профіль: зміна пароля (клієнт), перегляд пароля (менеджер) ──
-const _openProfile2 = openProfile;
-openProfile = async function(cidArg){
-  await _openProfile2(cidArg);
-  const form = $('pForm'); if(!form) return;
-  const r = S.lastProfile; const blk = document.createElement('div'); blk.className = 'ccard';
-  blk.innerHTML = `<b>Пароль для входу</b>${r?.password !== undefined && !isClient() ? `<div>Пароль клієнта: <code class="pwd">${esc(r.password)}</code> <span class="small">— продиктуйте клієнту, якщо забув</span></div>` : ''}
-    <div class="row"><input id="pNew" type="text" placeholder="Новий пароль (мін. 4 символи)" style="flex:1"><button id="pSet" class="sm">Змінити пароль</button></div>${isClient() ? PASS_WARN : ''}<span class="small" id="pPassOk"></span>`;
-  form.after(blk);
-  $('pSet').onclick = async () => { const v = $('pNew').value.trim(); if(v.length < 4){ $('pPassOk').textContent = 'Щонайменше 4 символи'; return; }
-    try{ await API('profile_save', { client_id:r?.client?.id, profile:{ password:v } }); $('pPassOk').textContent = 'Пароль змінено ✓'; $('pNew').value = ''; const c = blk.querySelector('.pwd'); if(c) c.textContent = v; }catch(e){ $('pPassOk').textContent = e.message; } };
-};
-openProfile = tracked(openProfile);
 const _API0 = API;
 
 // ── Значок вкладки і миготіння: коли ШІ закінчив, а вкладка у фоні ──
@@ -3201,7 +3491,7 @@ function shMenu(){
     ['Допомога', [['help','Що вміє ШІ і як краще'], ['idea','Повідомити про помилку / ідею']]]];
   return [
     ['Робота', [['chat','Новий підбір'], ['clients','Клієнти'], ['search','Пошук'], ['chats','Мої чати']]],
-    ['Керування', [...(isDir() ? [['report','Звіт'], ['ideas','Пропозиції й помилки ШІ']] : []), ['eye','Подивитись як клієнт']]],
+    ['Керування', [['profile','Мій профіль'], ...(isDir() ? [['report','Звіт'], ['ideas','Пропозиції й помилки ШІ']] : []), ['eye','Подивитись як клієнт']]],
     ['Допомога', [['news','Новинки і викладки'], ['help','Що вміє ШІ і як краще'], ['idea','Повідомити про помилку / ідею']]]];
 }
 
@@ -3251,7 +3541,7 @@ tabsRender = function(){
   if(!S.me) return;
   const t = shTabs(), btn = ([k, l]) => `<button data-tab="${k}">${shIco(k)}<span>${l}</span>${k === 'clients' ? '<i class="tb" id="tbBadge" hidden></i>' : ''}</button>`;
   $('shNav').innerHTML = t.map(btn).join('');
-  const mob = [...t.slice(0, 3), isClient() ? ['profile','Профіль'] : isDir() ? ['report','Звіт'] : ['profileStaff','Я'], ['menu','Меню']].filter(x => x[0] !== 'profileStaff');
+  const mob = [...t.slice(0, 3), isClient() ? ['profile','Профіль'] : isDir() ? ['report','Звіт'] : ['profile','Профіль'], ['menu','Меню']];
   $('tabbar').innerHTML = mob.map(btn).join('');
   $('topTabs').innerHTML = ''; $('tabbar').hidden = false; document.body.classList.add('hasTabs');
   document.querySelectorAll('[data-tab]').forEach(b => b.onclick = () => tabGo(b.dataset.tab));
@@ -3277,7 +3567,7 @@ function drawerOpen(side){
       <button class="dr-x" data-dm="x" aria-label="Закрити">✕</button>
       <div class="dr-ava">${w.ava ? `<img src="${w.ava}" alt="">` : avatarSVG(w.name, 56)}</div>
       <div class="dr-who"><b>${esc(w.name)}</b><span class="dr-role ${S.viewAs ? 'va' : ''}">${esc(w.role)}</span></div>
-      ${isClient() ? `<button class="dr-link" data-dm="profile">Мій профіль →</button>` : ''}
+      <button class="dr-link" data-dm="profile">Мій профіль →</button>
     </div>
     ${S.viewAs ? `<button class="dr-va" data-dm="vaexit">${shIco('back')}<span>Повернутись у свій режим</span></button>` : ''}
     <div class="dr-body">${shMenu().map(([h, list]) => `<div class="dr-grp">${esc(h)}</div>${list.map(item).join('')}`).join('')}</div>
