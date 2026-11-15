@@ -681,10 +681,24 @@ body.shellOn .vabar{position:sticky;top:var(--vt2,0px);z-index:29}
 .optn .code{font-family:var(--mono);color:var(--brand-ink);font-size:12px}
 .optq{color:var(--muted);white-space:nowrap}.optp{white-space:nowrap}
 .optbox .row{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
+@media (max-width:720px){
+  html,body{max-width:100vw!important;overflow-x:hidden!important}
+  header,nav,.gut,.comp,.in,.introIn,#feed{max-width:100vw!important;min-width:0!important;box-sizing:border-box!important}
+  .i-facts,.i-caps{max-width:100%!important;flex-wrap:wrap!important}
+  .cards{display:flex!important;flex-direction:column!important;width:100%!important;gap:10px!important}
+  .tile,.card{min-width:0!important;width:100%!important}
+}
 @media (max-width:640px){.optrow{grid-template-columns:20px 1fr auto}.optrow .optq{display:none}.optrow button{grid-column:2/4;justify-self:start}}
 .scprev{display:grid;grid-template-columns:minmax(0,260px) 1fr;gap:14px;align-items:center;border:1px solid var(--line);border-left:3px solid var(--brand);padding:10px;margin-bottom:12px;background:var(--surface)}
 .scth{cursor:zoom-in;background:#fff;border:1px solid var(--line)}.scth svg{width:100%;height:auto;display:block}
 .scact{display:flex;flex-direction:column;gap:6px}.scact b{font-size:15px}.scact .row{display:flex;gap:8px;flex-wrap:wrap}
+@media (max-width:720px){
+  html,body{max-width:100vw!important;overflow-x:hidden!important}
+  header,nav,.gut,.comp,.in,.introIn,#feed{max-width:100vw!important;min-width:0!important;box-sizing:border-box!important}
+  .i-facts,.i-caps{max-width:100%!important;flex-wrap:wrap!important}
+  .cards{display:flex!important;flex-direction:column!important;width:100%!important;gap:10px!important}
+  .tile,.card{min-width:0!important;width:100%!important}
+}
 @media (max-width:640px){.scprev{grid-template-columns:1fr}}
 .scbar{display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:8px 0}
 .sclay{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:999px;padding:5px 10px;font-size:13px;font-weight:600;cursor:pointer}
@@ -772,6 +786,13 @@ body.shellOn .comp{border-radius:12px!important;box-shadow:0 2px 8px rgba(0,0,0,
 .mgr-actions a{text-decoration:none;font-size:13px;padding:7px 12px;border-radius:6px!important;display:inline-flex;align-items:center;gap:5px}
 .pass-card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px;display:flex;flex-direction:column;gap:8px}
 .pass-card input{font:inherit;font-size:14px;padding:9px 11px;border:1px solid var(--line);border-radius:6px!important;background:var(--sunk);color:var(--fg);min-width:0}
+@media (max-width:720px){
+  html,body{max-width:100vw!important;overflow-x:hidden!important}
+  header,nav,.gut,.comp,.in,.introIn,#feed{max-width:100vw!important;min-width:0!important;box-sizing:border-box!important}
+  .i-facts,.i-caps{max-width:100%!important;flex-wrap:wrap!important}
+  .cards{display:flex!important;flex-direction:column!important;width:100%!important;gap:10px!important}
+  .tile,.card{min-width:0!important;width:100%!important}
+}
 @media (max-width:640px){
   .cards{grid-template-columns:1fr!important}
   .tile,.card{min-width:0;width:100%}
@@ -899,7 +920,7 @@ const $ = id => document.getElementById(id);
 // ТЕСТ: модель MiniMax M3.1 Flash. Ключ MiniMax → напряму api.minimax.io; ключ OpenRouter (sk-or-…) → через openrouter.ai.
 // ── Автооновлення: одне постійне посилання без ?v=. Сторінка сама перевіряє, чи на GitHub не вийшла новіша версія,
 // і тихо перезавантажується (адреса в рядку браузера лишається та сама). При кожному оновленні міняти APP_VER.
-const APP_VER = '2026-11-15.2';
+const APP_VER = '2026-11-15.3';
 const HP_SHOWROOM = { schedule:'Пн–Пт 09:00–18:00', address:'Львів, вул. Зелена, 238, корпус «В»' };
 const HP_MANAGERS = [
   { id:'vlad', name:'Владислав Гірняк', role:'Менеджер', phones:['+38 (067) 534 59 41','+38 (063) 334 36 54'], email:'HirniakVO@hot-point.com.ua', tg:'https://t.me/Manaaggerr03', viber:'+380675345941', url:'https://youneedtoworkwithme.github.io/vlad/' },
