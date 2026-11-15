@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow">
-<link rel="icon" href="https://hot-point.com.ua/image/hp_logo_ua.svg"><link rel="alternate icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Crect width=%2232%22 height=%2232%22 rx=%228%22 fill=%22%23F2673A%22/%3E%3Ctext x=%2216%22 y=%2222%22 font-size=%2216%22 font-family=%22Arial%22 font-weight=%22bold%22 fill=%22white%22 text-anchor=%22middle%22%3EГТ%3C/text%3E%3C/svg%3E">
+<link rel="icon" href="hp_logo.svg"><link rel="alternate icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Crect width=%2232%22 height=%2232%22 rx=%228%22 fill=%22%23F2673A%22/%3E%3Ctext x=%2216%22 y=%2222%22 font-size=%2216%22 font-family=%22Arial%22 font-weight=%22bold%22 fill=%22white%22 text-anchor=%22middle%22%3EГТ%3C/text%3E%3C/svg%3E">
 <title>Hotpoint.ai</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap">
 <style>
@@ -582,7 +582,7 @@ body.shellOn header{position:sticky;top:0;z-index:30;background:color-mix(in srg
 .shell .in{display:flex;align-items:center;gap:10px;min-height:60px;padding-block:6px}
 .sh-ic{width:40px;height:40px;display:grid;place-items:center;padding:0!important;border:1px solid var(--line)!important;background:var(--surface)!important;color:var(--fg)!important;flex:none}
 .sh-ic svg{width:22px;height:22px}
-.sh-logo{display:flex;align-items:center;background:#fff;padding:3px 6px;border-radius:4px;text-decoration:none;flex:none}
+.sh-logo{display:flex;align-items:center;background:transparent;padding:0;border-radius:0;text-decoration:none;flex:none}
 .sh-logo img{height:34px;width:auto;display:block}
 .sh-logo.nologo img{display:none}
 .sh-logo.nologo::after{content:'Гаряча Точка';font-weight:800;font-style:italic;font-size:17px;color:#F2673A}
@@ -799,7 +799,7 @@ body.shellOn .comp{border-radius:12px!important;box-shadow:0 2px 8px rgba(0,0,0,
 
 <header>
   <div class="gut hrow"><div class="in">
-    <a class="logo" href="https://hot-point.com.ua/" target="_blank" rel="noopener"><img src="https://hot-point.com.ua/image/hp_logo_ua.svg" alt="" onerror="this.parentNode.classList.add('nologo')"></a>
+    <a class="logo" href="https://hot-point.com.ua/" target="_blank" rel="noopener"><img src="hp_logo.svg" alt="Гаряча Точка" onerror="this.parentNode.classList.add('nologo')"></a>
     <span class="aibadge"><span class="dot"></span>ШІ-помічник</span>
     <a class="phone" href="tel:0800305777"><div><b>0-800-305-777</b><span>безкоштовно по Україні</span></div></a>
   </div></div>
@@ -906,7 +906,7 @@ const $ = id => document.getElementById(id);
 // ТЕСТ: модель MiniMax M3.1 Flash. Ключ MiniMax → напряму api.minimax.io; ключ OpenRouter (sk-or-…) → через openrouter.ai.
 // ── Автооновлення: одне постійне посилання без ?v=. Сторінка сама перевіряє, чи на GitHub не вийшла новіша версія,
 // і тихо перезавантажується (адреса в рядку браузера лишається та сама). При кожному оновленні міняти APP_VER.
-const APP_VER = '2026-11-15.4';
+const APP_VER = '2026-11-15.5';
 const HP_SHOWROOM = { schedule:'Пн–Пт 09:00–18:00', address:'Львів, вул. Зелена, 238, корпус «В»' };
 const HP_MANAGERS = [
   { id:'vlad', name:'Владислав Гірняк', role:'Менеджер', phones:['+38 (067) 534 59 41','+38 (063) 334 36 54'], email:'HirniakVO@hot-point.com.ua', tg:'https://t.me/Manaaggerr03', viber:'+380675345941', url:'https://youneedtoworkwithme.github.io/vlad/' },
