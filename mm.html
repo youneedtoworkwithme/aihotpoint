@@ -1822,7 +1822,7 @@ function projCalc(P, said){
   if(heat === 'gas') add('Димохід коаксіальний 60/100 для котла (комплект)', 1, 'шт');
   // джерело ГВ не назвали → додатково бойлер 150 л з рециркуляцією (правило майстра)
   const hwBoiler = heat === 'boiler' || N('boiler') || (!P.heat && !/двоконтур|центральн|котел|колонк/i.test(said || ''));
-  if(hwBoiler){ add('Бойлер електричний 150 л', 1, 'шт', 'rough_plumbing', '', heat === 'gas' ? 'джерело ГВ не вказано: якщо ГВ дає двоконтурний котел — бойлер і рециркуляцію прибрати' : ''); add('Клапан запобіжний 1/2 6 бар для бойлера', 1, 'шт', 'rough_plumbing', 91984); add('Лійка для дренажу HL21', 1, 'шт', 'rough_plumbing', 100078);
+  if(hwBoiler){ add('Бойлер електричний 150 л', 1, 'шт', 'rough_plumbing', '', heat === 'gas' && !P.wiz ? 'джерело ГВ не вказано: якщо ГВ дає двоконтурний котел — бойлер і рециркуляцію прибрати' : ''); add('Клапан запобіжний 1/2 6 бар для бойлера', 1, 'шт', 'rough_plumbing', 91984); add('Лійка для дренажу HL21', 1, 'шт', 'rough_plumbing', 100078);
     add('Насос рециркуляційний SPE 12/1.4S Termojet', 1, 'шт', 'rough_plumbing', 104090); add('Клапан зворотний 1/2', 1, 'шт', 'rough_plumbing', 72191); add('Кран кульовий 1/2 з американкою RAFTEC (рециркуляція)', 2, 'шт');
     add('Труба PPR Fiber Basalt ф20 Ekoplastik (рециркуляція)', Math.ceil(Math.max(12, area * 0.4) / 4) * 4, 'м', 'rough_plumbing', 21920); }
   add('Система захисту від протікання: кран на ввід + датчики в мокрі зони', 1, 'шт', 'rough_plumbing', '', 'Mastino / Ajax / Tervix — датчик біля мийки, пральної, санвузла, котла/бойлера');
@@ -1874,31 +1874,34 @@ function projCalc(P, said){
   add('Клема WAGO 221-413 (уп. 50)', ceil(nr / 3), 'уп', 'rough_electrical');
   // ── Чистова з візуалізацій: атрибути приладу йдуть у потребу → підбір з матриці ──
   const attr = f => [f.mount, f.color, f.shape, f.width ? 'ш ' + f.width : ''].filter(Boolean).join(', ');
-  for(const f of F('sink')){ add(`Умивальник ${attr(f) || 'білий'}`, 1, 'шт', 'finish_plumbing'); add(`Змішувач для умивальника ${f.color ? f.color : 'хром'}${/накладн/.test(f.mount||'') ? ', високий' : ''}`, 1, 'шт', 'finish_plumbing'); add('Сифон для умивальника', 1, 'шт', 'finish_plumbing'); add('Кран кутовий 1/2 для змішувача', 2, 'шт', 'finish_plumbing'); add('Дзеркало для ванної', 1, 'шт', 'finish_plumbing'); }
-  for(const f of F('kitchen_sink')){ add(`Мийка кухонна ${attr(f)}`, 1, 'шт', 'finish_plumbing'); add('Змішувач для кухні', 1, 'шт', 'finish_plumbing'); add('Кран кутовий 1/2 для змішувача', 2, 'шт', 'finish_plumbing'); }
-  for(const f of F('toilet')){ add(`Унітаз підвісний rimless ${attr(f)}`, 1, 'шт', 'finish_plumbing'); add('Кнопка змиву Geberit', 1, 'шт', 'finish_plumbing'); }
-  for(const f of F('shower')) add(f.hidden ? `Душова система прихованого монтажу ${f.color || ''}` : `Душова система ${f.color || ''}`, 1, 'шт', 'finish_plumbing');
-  for(const f of F('bath')) add(`Змішувач для ванни ${f.color || ''}${f.hidden ? ' прихованого монтажу' : ''}`, 1, 'шт', 'finish_plumbing');
-  for(const f of F('hygienic')) add(`Гігієнічний душ прихованого монтажу ${f.color || ''}`, 1, 'шт', 'finish_plumbing');
+  for(const f of F('sink')){ add(`Умивальник ${attr(f) || 'білий'}`, 1, 'шт', 'finish_plumbing'); add(`Змішувач для умивальника ${f.mix || f.color || 'хром'}${/накладн/.test(f.mount||'') ? ', високий' : ''}`, 1, 'шт', 'finish_plumbing'); add('Сифон для умивальника', 1, 'шт', 'finish_plumbing'); add('Кран кутовий 1/2 для змішувача', 2, 'шт', 'finish_plumbing'); add('Дзеркало для ванної', 1, 'шт', 'finish_plumbing'); }
+  for(const f of F('kitchen_sink')){ add(`Мийка кухонна ${attr(f)}`, 1, 'шт', 'finish_plumbing'); add('Змішувач для кухні' + (f.mix ? ' ' + f.mix : ''), 1, 'шт', 'finish_plumbing'); add('Кран кутовий 1/2 для змішувача', 2, 'шт', 'finish_plumbing'); }
+  for(const f of F('toilet')){ add(`Унітаз підвісний rimless ${attr(f)}`, 1, 'шт', 'finish_plumbing'); add('Кнопка змиву Geberit' + (f.mix ? ' ' + f.mix : ''), 1, 'шт', 'finish_plumbing'); }
+  for(const f of F('shower')) add(f.hidden ? `Душова система прихованого монтажу ${f.mix || f.color || ''}` : `Душова система ${f.mix || f.color || ''}`, 1, 'шт', 'finish_plumbing');
+  for(const f of F('bath')) add(`Змішувач для ванни ${f.mix || f.color || ''}${f.hidden ? ' прихованого монтажу' : ''}`, 1, 'шт', 'finish_plumbing');
+  for(const f of F('hygienic')) add(`Гігієнічний душ прихованого монтажу ${f.mix || f.color || ''}`, 1, 'шт', 'finish_plumbing');
   for(const f of F('towel')){ add(`Рушникосушка водяна ${attr(f)}`, 1, 'шт', 'finish_plumbing'); add('ТЕН для рушникосушки 0,6 кВт', 1, 'шт', 'finish_plumbing'); add('Крани для рушникосушки кутові (пара)', 1, 'шт', 'finish_plumbing'); }
   return { items:out, heat, loops, beds:beds.length, outlets, area, hwBoiler };
 }
 async function projectDraft(file, said, wait){
   wait.phase = 'Розпізнаю проєкт';
-  const P = await projRecognize(file, said, wait);
+  const P = wait.wizP || await projRecognize(file, said, wait);
   if(!P.rooms.length && !P.fixtures.length) return { items:[], reply:'Не зміг розпізнати кімнат і приладів.', limits:'План нечитабельний або без підписів. Надішліть план з площами кімнат або напишіть: кімнати з площами, скільки санвузлів, умивальників, душів, котел чи бойлер.' };
-  const C = projCalc(P, said);
+  const C = projCalc(P, P.wiz ? '' : said);
   try{ wait.scheme = schemeData(P, C, said); }catch(e){ console.warn('scheme', e); }
   const heatT = { gas:'газовий двоконтурний котел', boiler:'бойлер', central:'центральне' }[C.heat];
   const fxT = Object.entries(P.fixtures.reduce((a, f) => (a[f.type] = (a[f.type] || 0) + 1, a), {})).map(([k, v]) => `${FX[k]} ×${v}`).join(', ');
-  const reply = `**Що розпізнав** (${P.pages} стор.): площа ≈ ${C.area} м²; кімнати: ${P.rooms.map(r => `${r.name}${r.area ? ' ' + r.area + ' м²' : ''}`).join(', ') || '—'}.\n`
+  let reply = `**Що розпізнав** (${P.pages} стор.): площа ≈ ${C.area} м²; кімнати: ${P.rooms.map(r => `${r.name}${r.area ? ' ' + r.area + ' м²' : ''}`).join(', ') || '—'}.\n`
     + `**Прилади:** ${fxT || '—'}.\n**Рішення за правилами майстра:** тепло — ${heatT}; вода PPR Ekoplastik (ХВ PN20, ГВ Fiber Basalt), ${C.outlets} виводів; `
     + (C.loops.length ? `тепла підлога ${C.loops.length} контур(и), ≈${Math.round(C.loops.reduce((s, l) => s + l.m, 0))} м труби; ` : '')
     + (C.beds ? `радіатори в ${C.beds} кімнатах, де сплять (без ТП); ` : '') + 'каналізація OSTENDORF HT Safe.\n'
     + '**Уточніть (поки взяв за замовчуванням):** 1) нульова точка — де ввід води і стояки каналізації (взяв: ввід біля вхідних дверей, стояки біля санвузла і кухні), фото стояків; 2) звідки гаряча вода — бойлер, двоконтурний котел чи центральна; 3) техмісце для колектора ТП і водопідготовки (взяв: гардеробна/коридор біля входу); 4) схема води — трійникова чи колекторна.\n'
     + 'Щось не так — допишіть поправку текстом (напр. «кухня 14 м², бойлер замість котла, 2 умивальники в санвузлі») і я перерахую.';
+  if(P.wiz) reply = reply.replace(/^\*\*Що розпізнав\*\* \(\d+ стор\.\)/, `**Ваш проєкт з майстра** (${esc(P.label || '')})`)
+    .replace(/\*\*Уточніть \(поки взяв за замовчуванням\):\*\*[^\n]*\n/, '**Уточніть на об’єкті:** 1) нульова точка — де ввід води і стояки каналізації (взяв: ввід біля вхідних дверей, стояки біля санвузла і кухні), фото стояків; 2) техмісце для колектора ТП і водопідготовки (взяв: гардероб/коридор біля входу); 3) схема води — трійникова чи колекторна.\n')
+    .replace(/Щось не так — [^\n]*$/, 'Щось не так — відкрийте «Майстер проєкту» ще раз або допишіть поправку текстом, і я перерахую.');
   const limits = [!P.rooms.some(r => r.area) ? 'не знайшов площ кімнат — тепла підлога і радіатори орієнтовні' : '', !P.fixtures.length ? 'не знайшов приладів на візуалізаціях' : '', 'траси і точну кількість фітингів рахую за нормами, без креслення трас'].filter(Boolean).join('; ');
-  return { items:C.items, reply, limits, title:'Проєкт ' + (C.area ? C.area + ' м²' : 'за дизайном'), checklist:[], lines:C.items.length };
+  return { items:C.items, reply, limits:P.wiz ? 'траси і точну кількість фітингів рахую за нормами, без креслення трас; нульову точку й техмісце уточнить менеджер' : limits, title:'Проєкт ' + (C.area ? C.area + ' м²' : 'за дизайном'), checklist:[], lines:C.items.length, prefs:P.wiz ? P.wish || '' : undefined };
 }
 
 async function extractList(file, said, wait){
@@ -3924,5 +3927,573 @@ const _rtUx = renderTyping; renderTyping = function(m){ if(S.chat.indexOf(m) < 0
 })();
 
 </script>
+<!-- ══ Майстер проєкту (покроковий розрахунок без PDF) ══ -->
+<style>
+#wiz{position:fixed;inset:0;z-index:58;background:var(--bg);display:flex;flex-direction:column;font-family:var(--sans);color:var(--fg)}
+body.wzOn{overflow:hidden}
+#wiz button{font:inherit}
+#wiz .wz-top{flex:none;background:var(--surface);border-bottom:1px solid var(--line)}
+#wiz .wz-tin,#wiz .wz-pin{max-width:1180px;margin:0 auto;padding:10px max(16px,env(safe-area-inset-left,0px))}
+#wiz .wz-tin{display:flex;align-items:center;gap:12px}
+#wiz .wz-x{width:40px;height:40px;padding:0!important;border-radius:12px!important;display:grid;place-items:center;flex:none}
+#wiz .wz-x svg{width:20px;height:20px}
+#wiz .wz-tt{display:flex;flex-direction:column;min-width:0;flex:1}
+#wiz .wz-tt b{font-size:16px;font-weight:800;letter-spacing:-.01em}
+#wiz .wz-tt small{color:var(--muted);font-size:12.5px;font-weight:600}
+#wiz .wz-tt small i{font-style:normal;color:var(--brand-ink)}
+#wiz .wz-reset{font-size:13px!important;padding:6px 10px!important;border-radius:10px!important;color:var(--muted)!important}
+#wiz .wz-pin{padding-top:0;padding-bottom:12px;display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:6px}
+#wiz .wz-seg{all:unset;cursor:pointer;display:flex;flex-direction:column;gap:6px;min-width:0}
+#wiz .wz-seg i{display:block;height:5px;border-radius:99px!important;background:var(--line);overflow:hidden;position:relative}
+#wiz .wz-seg i::after{content:"";position:absolute;inset:0;background:var(--brand);transform:scaleX(0);transform-origin:left;transition:transform .35s ease}
+#wiz .wz-seg.done i::after,#wiz .wz-seg.cur i::after{transform:scaleX(1)}
+#wiz .wz-seg span{font-size:11.5px;font-weight:700;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#wiz .wz-seg.cur span{color:var(--fg)}
+#wiz .wz-seg[disabled]{cursor:default}
+#wiz .wz-seg:focus-visible i{outline:2px solid var(--brand);outline-offset:2px}
+@media (max-width:640px){#wiz .wz-seg span{display:none}}
+#wiz .wz-main{flex:1;min-height:0;overflow:auto;-webkit-overflow-scrolling:touch}
+#wiz .wz-grid{max-width:1180px;margin:0 auto;padding:22px max(16px,env(safe-area-inset-left,0px)) 40px;display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:28px;align-items:start}
+#wiz .wz-grid.solo{grid-template-columns:minmax(0,1fr)}
+@media (max-width:960px){#wiz .wz-grid{grid-template-columns:minmax(0,1fr)}#wiz .wz-side{display:none!important}}
+#wiz .wz-h{margin:0 0 4px;font-size:26px;line-height:1.2;font-weight:800;letter-spacing:-.02em;text-wrap:balance}
+#wiz .wz-sub{margin:0 0 18px;color:var(--muted);font-size:14.5px;max-width:640px}
+#wiz .wz-q{margin:22px 0 10px;font-size:15px;font-weight:800;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+#wiz .wz-q small{font-weight:600;color:var(--muted);font-size:12.5px}
+/* картки-варіанти з ілюстрацією */
+.wz-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px}
+#wiz .wz-card{all:unset;box-sizing:border-box;cursor:pointer;position:relative;display:flex;flex-direction:column;border:1.5px solid var(--line);border-radius:16px!important;background:var(--surface);overflow:hidden;transition:border-color .15s,box-shadow .15s,transform .15s}
+#wiz .wz-card:hover{border-color:var(--brand);transform:translateY(-1px)}
+#wiz .wz-card:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+#wiz .wz-card .wz-art{height:96px;display:grid;place-items:center;color:var(--graphite);position:relative;
+  background:linear-gradient(var(--line) 1px,transparent 1px) 0 0/16px 16px,linear-gradient(90deg,var(--line) 1px,transparent 1px) 0 0/16px 16px,var(--sunk)}
+#wiz .wz-card .wz-art::before{content:"";position:absolute;inset:0;background:var(--sunk);opacity:.72}
+#wiz .wz-card .wz-art svg{position:relative;width:52px;height:52px}
+#wiz .wz-card .wz-cap{padding:10px 12px 12px;display:flex;flex-direction:column;gap:2px}
+#wiz .wz-card b{font-size:14.5px;font-weight:700;line-height:1.3}
+#wiz .wz-card small{font-size:12px;color:var(--muted);line-height:1.35}
+#wiz .wz-card .wz-dot{position:absolute;top:10px;left:10px;width:20px;height:20px;border-radius:50%!important;border:1.5px solid var(--ctl,#8A8580);background:var(--surface);display:grid;place-items:center;z-index:1}
+#wiz .wz-card.multi .wz-dot{border-radius:6px!important}
+#wiz .wz-card.on{border-color:var(--brand);box-shadow:0 0 0 3px color-mix(in srgb,var(--brand) 18%,transparent)}
+#wiz .wz-card.on .wz-art{color:var(--brand-ink)}
+#wiz .wz-card.on .wz-art::before{background:var(--tint);opacity:.82}
+#wiz .wz-card.on .wz-dot{background:var(--brand);border-color:var(--brand)}
+#wiz .wz-card.on .wz-dot::after{content:"";width:9px;height:5px;border:2px solid var(--on-brand,#fff);border-top:0;border-right:0;transform:translateY(-1px) rotate(-45deg)}
+#wiz .wz-cards.sm{grid-template-columns:repeat(auto-fill,minmax(138px,1fr))}
+#wiz .wz-cards.sm .wz-art{height:74px}#wiz .wz-cards.sm .wz-art svg{width:40px;height:40px}
+/* «таблетки» для дрібних опцій */
+.wz-pills{display:flex;flex-wrap:wrap;gap:8px}
+#wiz .wz-pill{all:unset;cursor:pointer;box-sizing:border-box;padding:9px 14px;border:1.5px solid var(--line);border-radius:999px!important;background:var(--surface);font-size:14px;font-weight:600;display:inline-flex;align-items:center;gap:8px}
+#wiz .wz-pill:hover{border-color:var(--brand)}
+#wiz .wz-pill:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+#wiz .wz-pill.on{border-color:var(--brand);background:var(--tint);color:var(--brand-ink)}
+#wiz .wz-sw{width:22px;height:22px;border-radius:50%!important;border:1px solid rgba(0,0,0,.18);flex:none;box-shadow:inset 0 1px 2px rgba(255,255,255,.5)}
+#wiz .wz-pill.sw{padding:6px 14px 6px 6px}
+/* приміщення */
+.wz-rooms{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:16px!important;background:var(--surface);overflow:hidden}
+#wiz .wz-rt{display:grid;grid-template-columns:44px minmax(0,1fr) auto;align-items:center;gap:8px 12px;padding:12px 14px;border-top:1px solid var(--line)}
+#wiz .wz-rt:first-child{border-top:0}
+#wiz .wz-rt>svg{width:28px;height:28px;color:var(--graphite);justify-self:center}
+#wiz .wz-rt .wz-rn{display:flex;flex-direction:column;min-width:0}
+#wiz .wz-rt .wz-rn b{font-size:15px;font-weight:700;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+#wiz .wz-rt .wz-rn small{font-size:12px;color:var(--muted)}
+#wiz .wz-step{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:12px!important;overflow:hidden;background:var(--sunk)}
+#wiz .wz-step button{all:unset;cursor:pointer;width:38px;height:38px;display:grid;place-items:center;font-size:20px;font-weight:600;color:var(--fg)}
+#wiz .wz-step button:hover{background:var(--tint);color:var(--brand-ink)}
+#wiz .wz-step button:focus-visible{outline:2px solid var(--brand);outline-offset:-2px}
+#wiz .wz-step button[disabled]{opacity:.35;cursor:default;background:none}
+#wiz .wz-step output{min-width:28px;text-align:center;font-weight:800;font-size:15px}
+#wiz .wz-areas{grid-column:2/-1;display:flex;flex-wrap:wrap;gap:8px}
+#wiz .wz-area{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:12px!important;padding:4px 6px 4px 10px;background:var(--surface)}
+#wiz .wz-area span{font-size:12.5px;color:var(--muted);font-weight:600;white-space:nowrap}
+#wiz .wz-area input{width:64px;font:inherit;font-size:15px;font-weight:700;text-align:right;border:0;background:var(--sunk);border-radius:8px!important;padding:6px 8px;color:var(--fg)}
+#wiz .wz-area input:focus{outline:2px solid var(--brand)}
+#wiz .wz-area em{font-style:normal;font-size:13px;color:var(--muted)}
+#wiz .wz-area.bad{border-color:#d92d20}
+#wiz .wz-tag{font-size:10.5px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;padding:2px 7px;border-radius:6px!important;white-space:nowrap}
+#wiz .wz-tag.tp{background:var(--tint);color:var(--brand-ink)}
+#wiz .wz-tag.rad{background:color-mix(in srgb,#1E73BE 14%,transparent);color:#1E73BE}
+#wiz .wz-tag.no{background:var(--sunk);color:var(--muted)}
+#wiz .wz-hint{display:flex;gap:10px;align-items:flex-start;margin-top:14px;padding:12px 14px;border-radius:14px!important;background:var(--sunk);font-size:13.5px;color:var(--muted)}
+#wiz .wz-hint svg{width:20px;height:20px;flex:none;color:var(--brand-ink);margin-top:1px}
+#wiz .wz-hint b{color:var(--fg)}
+/* санвузли */
+.wz-tabs{display:flex;gap:8px;overflow:auto;margin-bottom:16px;padding-bottom:2px}
+#wiz .wz-tabs button{all:unset;cursor:pointer;flex:none;padding:8px 14px;border-radius:12px!important;border:1.5px solid var(--line);font-weight:700;font-size:14px;background:var(--surface)}
+#wiz .wz-tabs button.on{border-color:var(--graphite);background:var(--graphite);color:var(--on-graphite,#fff)}
+#wiz .wz-tabs button:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+#wiz .wz-tabs button small{font-weight:600;opacity:.7;margin-left:6px}
+#wiz .wz-sub2{margin-top:12px;padding:14px;border-radius:16px!important;border:1px dashed var(--line);display:flex;flex-direction:column;gap:12px}
+#wiz .wz-lbl{font-size:13px;font-weight:700;color:var(--muted)}
+#wiz .wz-row{display:flex;flex-direction:column;gap:8px}
+/* бокова панель «Ваш проєкт» */
+.wz-side{position:sticky;top:0;display:flex;flex-direction:column;gap:12px}
+#wiz .wz-pan{border:1px solid var(--line);border-radius:18px!important;background:var(--surface);overflow:hidden}
+#wiz .wz-pan h3{margin:0;padding:14px 16px 0;font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--brand-ink);display:flex;align-items:center;gap:8px}
+#wiz .wz-pan h3 .live{width:8px;height:8px;border-radius:50%!important;background:var(--ok,#1E7A45);animation:wzPulse 1.8s infinite}
+@keyframes wzPulse{0%{box-shadow:0 0 0 0 rgba(30,122,69,.45)}70%{box-shadow:0 0 0 7px rgba(30,122,69,0)}100%{box-shadow:0 0 0 0 rgba(30,122,69,0)}}
+#wiz .wz-sch{margin:12px 12px 0;border-radius:12px!important;background:#fff;border:1px solid var(--line);overflow:hidden;cursor:zoom-in}
+#wiz .wz-sch svg{display:block;width:100%;height:auto}
+#wiz .wz-kpi{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);margin-top:12px;border-top:1px solid var(--line)}
+#wiz .wz-kpi div{background:var(--surface);padding:10px 14px;display:flex;flex-direction:column}
+#wiz .wz-kpi b{font-size:20px;font-weight:800;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+#wiz .wz-kpi small{font-size:11.5px;color:var(--muted);font-weight:600}
+#wiz .wz-sum{padding:12px 16px 14px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:2px}
+#wiz .wz-sum b{font-size:22px;font-weight:800;color:var(--brand-ink);font-variant-numeric:tabular-nums}
+#wiz .wz-sum small{font-size:12px;color:var(--muted)}
+/* нижня панель */
+.wz-bar{flex:none;background:var(--surface);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px)}
+#wiz .wz-bin{max-width:1180px;margin:0 auto;padding:10px max(16px,env(safe-area-inset-left,0px));display:flex;align-items:center;gap:10px}
+#wiz .wz-mini{all:unset;cursor:pointer;flex:1;min-width:0;display:flex;flex-direction:column}
+#wiz .wz-mini b{font-size:15px;font-weight:800;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#wiz .wz-mini small{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#wiz .wz-mini small u{text-decoration:none;color:var(--brand-ink);font-weight:700}
+@media (min-width:961px){#wiz .wz-mini{cursor:default}#wiz .wz-mini small u{display:none}}
+#wiz .wz-nav{display:flex;gap:8px;flex:none}
+#wiz .wz-nav button{min-width:120px;padding:12px 18px!important;border-radius:12px!important;font-size:15px!important}
+@media (max-width:520px){#wiz .wz-bin{flex-wrap:wrap}#wiz .wz-nav{width:100%}#wiz .wz-nav button{flex:1;min-width:0}}
+#wiz .wz-why{color:#b42318;font-weight:600}
+@media (max-width:640px){#wiz .wz-reset{font-size:0!important;padding:8px!important}#wiz .wz-reset::after{content:'Скинути';font-size:13px}#wiz .wz-tt small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}}
+@media (max-width:960px){#wiz .wz-go{display:none}#wiz .wz-intro h1{font-size:28px}}
+/* вступ */
+.wz-intro{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:32px;align-items:center}
+@media (max-width:900px){#wiz .wz-intro{grid-template-columns:1fr}}
+#wiz .wz-intro .eyebrow{margin-bottom:8px}
+#wiz .wz-intro h1{margin:0 0 10px;font-size:34px;line-height:1.12;font-weight:800;letter-spacing:-.025em;text-wrap:balance}
+#wiz .wz-intro h1 i{font-style:normal;color:var(--brand)}
+#wiz .wz-steps3{display:flex;flex-direction:column;gap:10px;margin:18px 0 20px;counter-reset:s}
+#wiz .wz-steps3 div{position:relative;padding:14px 70px 14px 16px;border-radius:16px!important;background:var(--surface);border:1px solid var(--line);overflow:hidden}
+#wiz .wz-steps3 div::after{counter-increment:s;content:counter(s);position:absolute;right:14px;top:50%;transform:translateY(-50%);font-size:64px;font-weight:800;line-height:1;color:var(--brand);opacity:.18}
+#wiz .wz-steps3 b{display:block;font-size:15.5px}
+#wiz .wz-steps3 small{color:var(--muted);font-size:13px}
+#wiz .wz-go{font-size:16px!important;padding:14px 26px!important;border-radius:14px!important;box-shadow:0 10px 26px rgba(242,103,58,.3)}
+#wiz .wz-alt{display:block;margin-top:12px;font-size:13.5px;color:var(--muted)}
+#wiz .wz-alt button{all:unset;cursor:pointer;color:var(--brand-ink);font-weight:700;text-decoration:underline;text-underline-offset:3px}
+#wiz .wz-demo{position:relative;margin:0;border-radius:20px!important;padding:14px;background:var(--surface);border:1px solid var(--line);box-shadow:0 18px 50px rgba(31,31,31,.12)}
+#wiz .wz-demo .wz-sch{margin:0;cursor:default}
+#wiz .wz-demo figcaption{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-top:10px;font-size:13px;color:var(--muted);font-weight:600}
+#wiz .wz-demo figcaption b{color:var(--fg)}
+#wiz .wz-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+#wiz .wz-chips span{font-size:12.5px;font-weight:700;padding:5px 10px;border-radius:999px!important;background:var(--sunk);color:var(--muted)}
+/* підсумок */
+.wz-recap{margin:0;display:flex;flex-direction:column;border:1px solid var(--line);border-radius:16px!important;background:var(--surface);overflow:hidden}
+#wiz .wz-recap>div{display:grid;grid-template-columns:150px minmax(0,1fr) auto;gap:12px;padding:12px 16px;border-top:1px solid var(--line);align-items:start}
+#wiz .wz-recap>div:first-child{border-top:0}
+#wiz .wz-recap dt{font-size:13px;font-weight:700;color:var(--muted)}
+#wiz .wz-recap dd{margin:0;font-size:14px;line-height:1.45}
+#wiz .wz-recap button{all:unset;cursor:pointer;font-size:13px;font-weight:700;color:var(--brand-ink)}
+@media (max-width:640px){#wiz .wz-recap>div{grid-template-columns:1fr auto}#wiz .wz-recap dt{grid-column:1/-1}}
+#wiz .wz-wish{width:100%;box-sizing:border-box;font:inherit;font-size:14.5px;border:1px solid var(--line);border-radius:14px!important;padding:12px 14px;background:var(--surface);color:var(--fg);resize:vertical;min-height:84px}
+#wiz .wz-wish:focus{outline:2px solid var(--brand)}
+#wiz .wz-get{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:16px}
+@media (max-width:700px){#wiz .wz-get{grid-template-columns:1fr 1fr}}
+#wiz .wz-get div{padding:12px;border-radius:14px!important;background:var(--sunk);display:flex;flex-direction:column;gap:6px}
+#wiz .wz-get svg{width:22px;height:22px;color:var(--brand-ink)}
+#wiz .wz-get b{font-size:13.5px}
+#wiz .wz-get small{font-size:12px;color:var(--muted)}
+/* мобільна панель,збільшена схема,підказка */
+.wz-msheet{position:fixed;inset:0;z-index:2;background:rgba(0,0,0,.45);display:flex;align-items:flex-end}
+#wiz .wz-msheet>div{width:100%;max-height:86%;overflow:auto;background:var(--bg);border-radius:20px 20px 0 0!important;padding:14px 14px max(16px,env(safe-area-inset-bottom,0px))}
+#wiz .wz-mhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+#wiz .wz-zoom{position:fixed;inset:0;z-index:3;background:rgba(0,0,0,.6);display:grid;place-items:center;padding:16px;cursor:zoom-out}
+#wiz .wz-zoom>div{background:#fff;border-radius:14px!important;max-width:1200px;width:100%;max-height:100%;overflow:auto}
+#wiz .wz-zoom svg{display:block;width:100%;height:auto;min-width:720px}
+#wiz .wz-toast{position:fixed;left:50%;bottom:96px;transform:translateX(-50%);z-index:4;background:var(--graphite);color:var(--on-graphite,#fff);padding:10px 16px;border-radius:12px!important;font-size:14px;font-weight:600;box-shadow:0 10px 30px rgba(0,0,0,.25);max-width:92vw}
+/* банер на головній */
+.wz-ban{all:unset;box-sizing:border-box;grid-column:1/-1;cursor:pointer;display:grid;grid-template-columns:64px minmax(0,1fr) auto;align-items:center;gap:16px;padding:18px 20px;border-radius:18px!important;color:var(--fg);
+  background:radial-gradient(120% 140% at 100% 0,color-mix(in srgb,var(--brand) 22%,transparent),transparent 55%),var(--surface);border:1.5px solid color-mix(in srgb,var(--brand) 45%,var(--line))!important;transition:transform .15s,box-shadow .15s}
+#cards .wz-ban:hover{transform:translateY(-1px);box-shadow:0 10px 30px rgba(242,103,58,.18)}
+#cards .wz-ban:focus-visible{outline:2px solid var(--brand);outline-offset:3px}
+#cards .wz-ban-ic{width:64px;height:64px;border-radius:16px!important;background:var(--tint);color:var(--brand-ink);display:grid;place-items:center}
+#cards .wz-ban-ic svg{width:36px;height:36px}
+#cards .wz-ban-t{display:flex;flex-direction:column;gap:2px;min-width:0}
+#cards .wz-ban-t small{font-size:11.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--brand-ink)}
+#cards .wz-ban-t b{font-size:18px;font-weight:800;letter-spacing:-.01em;line-height:1.25}
+#cards .wz-ban-t span{font-size:13.5px;color:var(--muted)}
+#cards .wz-ban-go{padding:11px 18px;border-radius:12px!important;background:var(--brand-ink);color:var(--on-brand,#fff);font-weight:700;font-size:14.5px;white-space:nowrap}
+@media (max-width:640px){#cards .wz-ban{grid-template-columns:48px minmax(0,1fr);padding:14px}#cards .wz-ban-ic{width:48px;height:48px;border-radius:12px!important}#cards .wz-ban-ic svg{width:28px;height:28px}#cards .wz-ban-go{grid-column:1/-1;text-align:center}#cards .wz-ban-t b{font-size:16px}}
+.i-wiz{position:relative;margin-top:2px;font-size:14px!important;border-radius:12px!important;border:1.5px solid var(--brand)!important;color:var(--brand-ink)!important;background:transparent!important;padding:10px 18px!important;opacity:0;animation:rise .5s 3.5s both}
+@media (prefers-reduced-motion:reduce){#wiz *,#cards .wz-ban{transition:none!important;animation:none!important}}
+</style>
+<script>
+(() => {
+// ── іконки (лінійні, у стилі плиток) ──
+const I = {
+  flat:'<path d="M4 21V4h11v17M15 9h5v12M2 21h20M7.5 7.5h1M11 7.5h1M7.5 11h1M11 11h1M7.5 14.5h1M11 14.5h1M17.5 12.5h.5M17.5 16h.5"/>',
+  house:'<path d="M3 11l9-7 9 7M5 9.5V21h14V9.5M10 21v-6h4v6"/>',
+  newb:'<path d="M5 21V3l14 3M5 6h14M9 3.8V6M17 6v4M15.5 10h3v3h-3zM2 21h13M8.5 21v-8h5v8"/>',
+  old:'<path d="M4 21V8l8-5 8 5v13M2 21h20M9 21v-4.5a3 3 0 0 1 6 0V21M8 10.5h2M14 10.5h2"/>',
+  gas:'<rect x="6" y="3" width="12" height="15" rx="1.5"/><path d="M9 18v3M15 18v3M12 7.2c1.6 1.4 2.2 2.6 2.2 3.6a2.2 2.2 0 0 1-4.4 0c0-.9.4-1.5 1-2"/>',
+  rad:'<path d="M4 6v13M8 6v13M12 6v13M16 6v13M20 6v13M2 9h20M2 16h20"/>',
+  ask:'<circle cx="12" cy="12" r="9"/><path d="M9.6 9.4a2.5 2.5 0 1 1 3.4 2.4c-.6.3-1 .8-1 1.5v.6M12 17v.2"/>',
+  tank:'<rect x="7" y="2.5" width="10" height="16" rx="5"/><path d="M10 18.5V21M14 18.5V21M12 7v5"/>',
+  kotel:'<rect x="5" y="3" width="10" height="14" rx="1.5"/><path d="M8 17v4M12 17v4M18 9c1.4 1.8 2 3 2 4a2 2 0 0 1-4 0c0-1 .6-2.2 2-4zM10 7.5c1 1 1.4 1.8 1.4 2.4a1.4 1.4 0 0 1-2.8 0c0-.6.3-1 .7-1.4"/>',
+  tap:'<path d="M3 9h9a3 3 0 0 1 3 3v2M7 9V6M4 6h6M15 17.5v.5M15 20.5v.5"/>',
+  bath:'<path d="M3 12h18v3a5 5 0 0 1-5 5H8a5 5 0 0 1-5-5zM6 12V5.5a2 2 0 0 1 4 0M7 20l-1 2M17 20l1 2"/>',
+  shower:'<path d="M5 21V6a3 3 0 0 1 3-3h2a3 3 0 0 1 3 3v1"/><path d="M10 9.5h6M13 9.5V7"/><path d="M11 13v1M13 13v2M15 13v1M12 17v1M14 17v1"/>',
+  sink:'<path d="M3 12h18a6 6 0 0 1-6 6H9a6 6 0 0 1-6-6zM12 12V6.5a2 2 0 0 1 4 0M9.5 18l-.8 3h6.6l-.8-3"/>',
+  wc:'<path d="M6 3h7v9H6zM6 12h12a5 5 0 0 1-5 5h-1.5l.8 3.5H7.8l.5-3.5A3.2 3.2 0 0 1 6 14z"/>',
+  hyg:'<path d="M5 8.5a4 4 0 0 1 8 0V10H5zM9 10v2.5a5.5 5.5 0 0 0 5.5 5.5H19M19 15v6"/>',
+  towel:'<path d="M6 3v18M18 3v18M6 6.5h12M6 10.5h12M6 14.5h12M6 18.5h12"/>',
+  washer:'<rect x="4" y="3" width="16" height="18" rx="2"/><circle cx="12" cy="13" r="4.5"/><path d="M7 6.3h2M15 6.3h2"/>',
+  dw:'<rect x="4" y="3" width="16" height="18" rx="1.5"/><path d="M4 8h16M7.5 5.5h2M8 12.5h8M8 16.5h8"/>',
+  bidet:'<path d="M4 11h16v1.5a5.5 5.5 0 0 1-5.5 5.5h-5A5.5 5.5 0 0 1 4 12.5zM9.5 18l-.8 3h6.6l-.8-3M12 11V7.5M10.5 7.5h3"/>',
+  ksink:'<path d="M2 11h20M4 11v4a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3v-4M12 11V5a2 2 0 0 1 4 0v1"/>',
+  ac:'<rect x="2" y="5" width="20" height="8" rx="2"/><path d="M6 10h12M7.5 16.5l-1 2.5M12 16.5V20M16.5 16.5l1 2.5"/>',
+  kitchen:'<path d="M4 10h16v6a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4zM2 10h20M9 6.5c0-1 1-1 1-2.2M14 6.5c0-1 1-1 1-2.2"/>',
+  living:'<path d="M4 11V8a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v3M2 12a2 2 0 0 1 4 0v2h12v-2a2 2 0 0 1 4 0v5H2zM5 17v2M19 17v2"/>',
+  bedroom:'<path d="M3 19V6M3 14h18v5M21 14v-2a3 3 0 0 0-3-3h-7v5"/><circle cx="7" cy="11" r="1.6"/>',
+  kids:'<path d="M12 3.5l2.5 5.1 5.6.8-4 3.9.9 5.6L12 16.2l-5 2.7.9-5.6-4-3.9 5.6-.8z"/>',
+  office:'<path d="M3 10h18M5 10v10M19 10v10M8 5.5h8V10H8z"/>',
+  hall:'<path d="M6 21V3h12v18M3 21h18M14.5 12v.5"/>',
+  wardrobe:'<path d="M12 7.5a2 2 0 1 1 2-2M12 7.5v2l9 6v2H3v-2l9-6"/>',
+  loggia:'<path d="M4 3h16v18H4zM12 3v18M4 12h16"/>',
+  info:'<circle cx="12" cy="12" r="9"/><path d="M12 11v5.5M12 7.5v.5"/>',
+  close:'<path d="M6 6l12 12M18 6L6 18"/>',
+  table:'<path d="M4 5h16v14H4zM4 10h16M9 10v9"/>',
+  xls:'<path d="M7 3h7l4 4v14H7z"/><path d="M14 3v4h4M9.5 12l4 5M13.5 12l-4 5"/>',
+  scheme:'<path d="M3 6h7v5H3zM14 13h7v5h-7zM6.5 11v4.5H14M17.5 13V8.5H10"/>',
+  pdf:'<path d="M7 3h7l4 4v14H7z"/><path d="M14 3v4h4M9.5 16.5h5M9.5 12.5h5"/>',
+};
+const ico = k => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${I[k] || ''}</svg>`;
+
+// ── дані майстра ──
+// [тип, назва, типова площа, максимум, іконка, підказка]
+const RTYPES = [
+  ['kitchen','Кухня',12,2,'kitchen','або кухня-вітальня'],
+  ['living','Вітальня',18,2,'living',''],
+  ['bedroom','Спальня',14,6,'bedroom',''],
+  ['kids','Дитяча',12,4,'kids',''],
+  ['office','Кабінет',10,2,'office',''],
+  ['bath','Санвузол',5,4,'bath','ванна кімната / суміщений'],
+  ['wc','Окремий туалет',2,3,'wc','унітаз і маленький умивальник'],
+  ['hall','Коридор',8,2,'hall','тут ввід води і техвузол'],
+  ['wardrobe','Гардероб',4,3,'wardrobe','або комора, пральня'],
+  ['loggia','Лоджія',5,3,'loggia','утеплена, з теплою підлогою'],
+];
+const MIX = [['хром','Хром','linear-gradient(135deg,#f6f8fa,#9aa3ab 45%,#eef1f3 62%,#7d868e)'],['чорний матовий','Чорний матовий','#232323'],['брашоване золото','Брашоване золото','linear-gradient(135deg,#efd9a1,#b58d47 50%,#f3e2b5)'],['брашований нікель','Брашований нікель','linear-gradient(135deg,#dedad2,#a19b90 50%,#e7e3dc)'],['білий матовий','Білий','#f7f6f3']];
+const CER = [['білий глянець','Білий глянець','#ffffff'],['білий матовий','Білий матовий','#efede8'],['чорний матовий','Чорний матовий','#262626']];
+const KSINK = [['нержавіюча сталь','Нержавійка','linear-gradient(135deg,#eef0f2,#a9b0b6 50%,#e4e7ea)'],['граніт чорний','Граніт чорний','radial-gradient(circle at 30% 30%,#555 0 8%,transparent 9%) 0 0/7px 7px,#262626'],['граніт білий','Граніт білий','radial-gradient(circle at 30% 30%,#c9c5bd 0 8%,transparent 9%) 0 0/7px 7px,#f1eee8'],['граніт сірий','Граніт сірий','radial-gradient(circle at 30% 30%,#6c6964 0 8%,transparent 9%) 0 0/7px 7px,#9a9690']];
+const STEPS = [['obj','Об’єкт'],['rooms','Приміщення'],['wet','Санвузли'],['kit','Кухня і техніка'],['sum','Підсумок']];
+const KEY = 'hpWiz';
+const def = () => ({ step:0, max:0, obj:'flat', cond:'new', heat:'gas', hw:'boiler',
+  rooms:{ kitchen:[12], living:[18], bedroom:[14], kids:[], office:[], bath:[5], wc:[], hall:[8], wardrobe:[], loggia:[] },
+  wet:{}, kit:{ sink:true, mount:'врізна', color:'нержавіюча сталь', mix:'хром', dw:true, washer:false }, ac:0, wish:'', tab:0 });
+let W = def();
+try{ const s = ls.get(KEY); if(s && s.rooms) W = { ...def(), ...s, rooms:{ ...def().rooms, ...s.rooms }, kit:{ ...def().kit, ...(s.kit || {}) }, wet:s.wet || {} }; }catch{}
+const keep = () => ls.set(KEY, W);
+const wetDef = (t, i) => t === 'bath'
+  ? { bath:true, bathHidden:false, shower:false, showerHidden:true, sink:true, sinkN:1, sinkMount:'накладний на стільницю', toilet:true, bidet:false, hyg:false, towel:true, washer:i === 0, mix:'хром', cer:'білий глянець' }
+  : { bath:false, bathHidden:false, shower:false, showerHidden:true, sink:true, sinkN:1, sinkMount:'підвісний', toilet:true, bidet:false, hyg:true, towel:false, washer:false, mix:'хром', cer:'білий глянець' };
+const wetList = () => [...W.rooms.bath.map((a, i) => ({ id:'bath' + i, t:'bath', i, a })), ...W.rooms.wc.map((a, i) => ({ id:'wc' + i, t:'wc', i, a }))];
+const cfg = w => W.wet[w.id] || (W.wet[w.id] = wetDef(w.t, w.i));
+// назви з різним початком — щоб схема не сплутала прилади двох санвузлів
+const rName = (t, i, n) => t === 'bath' ? (n > 1 ? `${i + 1}-й санвузол` : 'Санвузол') : t === 'wc' ? (n > 1 ? `${i + 1}-й туалет` : 'Туалет') : (RTYPES.find(r => r[0] === t)[1] + (n > 1 ? ' ' + (i + 1) : ''));
+const wName = w => rName(w.t, w.i, W.rooms[w.t].length);
+const area = () => Math.round(Object.values(W.rooms).flat().reduce((s, a) => s + (+a || 0), 0) * 10) / 10;
+const heatTxt = () => ({ gas:'газовий котел', central:'централізоване', unknown:'ще не вирішили (рахую газовий котел)' })[W.heat];
+const hwTxt = () => ({ boiler:'бойлер 150 л з рециркуляцією', kotel:'від двоконтурного котла', central:'централізована' })[W.hw];
+const tagOf = t => /bedroom|kids/.test(t) ? ['rad','радіатор'] : t === 'wardrobe' ? ['no','без опалення'] : ['tp','тепла підлога'];
+const cap = v => v[0].toUpperCase() + v.slice(1);
+
+// Те, що віддаємо двигуну projCalc (той самий формат, що дає розпізнавання PDF)
+function buildP(){
+  const rooms = [], fixtures = [];
+  for(const [t] of RTYPES){ const arr = W.rooms[t] || []; arr.forEach((a, i) => rooms.push({ name:rName(t, i, arr.length), type:t, area:Math.max(0, +a || 0) })); }
+  for(const w of wetList()){ const c = cfg(w), room = wName(w), mix = c.mix, cer = c.cer;
+    if(c.bath) fixtures.push({ type:'bath', room, hidden:!!c.bathHidden, mix });
+    if(c.shower) fixtures.push({ type:'shower', room, hidden:!!c.showerHidden, mix });
+    if(c.sink) for(let k = 0; k < (c.sinkN || 1); k++) fixtures.push({ type:'sink', room, mount:c.sinkMount, color:cer, mix });
+    if(c.toilet) fixtures.push({ type:'toilet', room, color:cer, mix });
+    if(c.bidet) fixtures.push({ type:'bidet', room, color:cer });
+    if(c.hyg) fixtures.push({ type:'hygienic', room, mix });
+    if(c.towel) fixtures.push({ type:'towel', room, color:mix });
+    if(c.washer) fixtures.push({ type:'washer', room }); }
+  const kn = W.rooms.kitchen.length ? rName('kitchen', 0, W.rooms.kitchen.length) : '';
+  if(kn){ const k = W.kit; if(k.sink) fixtures.push({ type:'kitchen_sink', room:kn, mount:k.mount, color:k.color, mix:k.mix }); if(k.dw) fixtures.push({ type:'dishwasher', room:kn }); if(k.washer) fixtures.push({ type:'washer', room:kn }); }
+  const acRoom = (rooms.find(r => /living|bedroom|kids|office/.test(r.type)) || rooms[0])?.name || '';
+  for(let k = 0; k < W.ac; k++) fixtures.push({ type:'ac', room:acRoom });
+  if(W.hw === 'boiler') fixtures.push({ type:'boiler', room:(rooms.find(r => r.type === 'wardrobe') || rooms.find(r => r.type === 'hall') || {}).name || '' });
+  const label = `${W.obj === 'flat' ? 'квартира' : 'будинок'}, ${W.cond === 'new' ? 'новобудова' : 'вторинка'}, ${area()} м²`;
+  return { rooms, fixtures, heat:W.heat === 'central' ? 'central' : 'gas', total:area(), pages:0, notes:'', wiz:true, wish:String(W.wish || '').trim(), label };
+}
+// Текст запиту в чаті (його ж зрозуміє ШІ, якщо потім дописати поправку)
+function summary(P){
+  const L = [`Майстер проєкту: ${P.label}.`, `Опалення: ${heatTxt()}; гаряча вода: ${hwTxt()}.`,
+    `Приміщення: ${P.rooms.map(r => `${r.name} ${r.area} м²`).join(', ')}.`];
+  for(const w of wetList()){ const c = cfg(w), a = [];
+    if(c.bath) a.push('ванна' + (c.bathHidden ? ' (змішувач прихований)' : ''));
+    if(c.shower) a.push(c.showerHidden ? 'душ прихованого монтажу' : 'душова стійка');
+    if(c.sink) a.push(`умивальник ${c.sinkMount}${c.sinkN > 1 ? ' ×' + c.sinkN : ''}`);
+    if(c.toilet) a.push('унітаз підвісний на інсталяції'); if(c.bidet) a.push('біде'); if(c.hyg) a.push('гігієнічний душ');
+    if(c.towel) a.push('рушникосушка водяна'); if(c.washer) a.push('пральна машина');
+    L.push(`${wName(w)} (${w.a} м²): ${a.join(', ') || 'без приладів'}; кераміка ${c.cer}, змішувачі ${c.mix}.`); }
+  if(W.rooms.kitchen.length){ const k = W.kit, a = [];
+    if(k.sink) a.push(`мийка ${k.mount}, ${k.color}, змішувач ${k.mix}`); if(k.dw) a.push('посудомийка'); if(k.washer) a.push('пральна машина');
+    L.push(`Кухня: ${a.join('; ') || 'без мийки'}.`); }
+  if(W.ac) L.push(`Кондиціонери: ${W.ac} (дренаж).`);
+  if(P.wish) L.push(`Побажання: ${P.wish}`);
+  return L.join('\n');
+}
+// Живий перерахунок: той самий двигун, що й у чаті
+let catMap = null, catN = 0;
+function live(){
+  const P = buildP(); let C = null, sc = null, sum = 0, priced = 0;
+  try{ C = projCalc(P, ''); }catch(e){ console.warn('wiz calc', e); }
+  try{ if(C && P.rooms.length) sc = schemeData(P, C, ''); }catch(e){ console.warn('wiz scheme', e); }
+  if(C && S.cat?.length){ if(!catMap || catN !== S.cat.length){ catMap = new Map(S.cat.map(x => [x[0], x])); catN = S.cat.length; }
+    for(const it of C.items){ if(!it.fixed) continue; const r = catMap.get(it.fixed); if(r){ sum += uah(r) * it.qty; priced++; } } }
+  return { P, C, sc, sum, priced };
+}
+const nf = n => Math.round(n).toLocaleString('uk-UA');
+const svgOf = sc => { try{ return sc ? schemeSVG(sc) : ''; }catch(e){ console.warn('wiz svg', e); return ''; } };
+
+// ── розмітка ──
+const root = document.createElement('div'); root.id = 'wiz'; root.hidden = true;
+root.setAttribute('role', 'dialog'); root.setAttribute('aria-modal', 'true'); root.setAttribute('aria-label', 'Майстер проєкту');
+root.innerHTML = `<div class="wz-top"><div class="wz-tin"><button class="wz-x" data-a="close" aria-label="Закрити майстер">${ico('close')}</button>
+  <div class="wz-tt"><b>Майстер проєкту</b><small id="wzT"></small></div><button class="ghost wz-reset" data-a="reset">Почати спочатку</button></div>
+  <div class="wz-pin" id="wzProg"></div></div>
+  <div class="wz-main" id="wzMain"><div class="wz-grid" id="wzGrid"><div id="wzBody"></div><aside class="wz-side" id="wzSide" aria-label="Ваш проєкт"></aside></div></div>
+  <div class="wz-bar"><div class="wz-bin" id="wzBar"></div></div>`;
+document.body.appendChild(root);
+const $w = id => document.getElementById(id);
+
+const card = (on, k, title, note, attrs, multi) => `<button class="wz-card${multi ? ' multi' : ''}${on ? ' on' : ''}" role="${multi ? 'checkbox' : 'radio'}" aria-checked="${on}" ${attrs}><span class="wz-dot"></span><span class="wz-art">${ico(k)}</span><span class="wz-cap"><b>${title}</b>${note ? `<small>${note}</small>` : ''}</span></button>`;
+const pill = (on, label, attrs, sw) => `<button class="wz-pill${sw ? ' sw' : ''}${on ? ' on' : ''}" aria-pressed="${on}" ${attrs}>${sw ? `<i class="wz-sw" style="background:${sw}"></i>` : ''}${label}</button>`;
+const stepper = (lbl, n, max, dec, inc) => `<div class="wz-step" role="group" aria-label="${lbl}: кількість"><button ${dec} ${n ? '' : 'disabled'} aria-label="Менше">−</button><output>${n}</output><button ${inc} ${n >= max ? 'disabled' : ''} aria-label="Більше">+</button></div>`;
+
+function vIntro(){
+  const d = live();
+  return `<div class="wz-intro"><div>
+    <div class="eyebrow">Hotpoint.ai · без креслень</div>
+    <h1>Порахуйте інженерку <i>за 2 хвилини</i></h1>
+    <p class="wz-sub" style="margin:0">Оберіть приміщення й сантехніку картинками, а ми порахуємо воду, каналізацію, теплу підлогу, радіатори й техвузол за регламентом майстра «Гарячої Точки».</p>
+    <div class="wz-steps3">
+      <div><b>Вкажіть об’єкт і приміщення</b><small>Тип житла, опалення, площі кімнат</small></div>
+      <div><b>Оберіть сантехніку картинками</b><small>Ванна чи душ, інсталяція, колір змішувачів</small></div>
+      <div><b>Отримайте специфікацію з цінами</b><small>Коди 1С, Excel, схема мереж і PDF-альбом</small></div>
+    </div>
+    <button class="btn wz-go" data-a="next">${W.max ? 'Продовжити' : 'Почати'} →</button>
+    <span class="wz-alt">Є дизайн-проєкт у PDF? <button data-a="pdf">Надішліть файл, і ШІ розпізнає його сам</button></span>
+  </div>
+  <figure class="wz-demo"><div class="wz-sch">${svgOf(d.sc)}</div>
+    <figcaption><span><b>Схема мереж малюється наживо</b><br>поки ви обираєте кімнати й прилади</span><span>${area()} м²</span></figcaption>
+    <div class="wz-chips"><span>PPR Ekoplastik</span><span>OSTENDORF HT Safe</span><span>колектор RAFTEC</span><span>ціни з прайсу</span></div></figure></div>`;
+}
+function vObj(){
+  const hwOpts = W.heat === 'central'
+    ? [['boiler','tank','Бойлер з рециркуляцією','+ бойлер 150 л, насос, запобіжна група'], ['central','tap','Централізована','без бойлера']]
+    : [['kotel','kotel','Від двоконтурного котла','без бойлера'], ['boiler','tank','Бойлер з рециркуляцією','+ бойлер 150 л, гаряча вода одразу']];
+  return `<h2 class="wz-h">Об’єкт</h2><p class="wz-sub">Чотири питання, і майстер знатиме, з чого починати.</p>
+  <div class="wz-q">Що облаштовуємо?</div><div class="wz-cards" role="radiogroup">
+    ${card(W.obj === 'flat', 'flat', 'Квартира', 'у багатоквартирному будинку', 'data-set="obj" data-v="flat"')}
+    ${card(W.obj === 'house', 'house', 'Будинок', 'приватний, таунхаус', 'data-set="obj" data-v="house"')}</div>
+  <div class="wz-q">Стан об’єкта</div><div class="wz-cards" role="radiogroup">
+    ${card(W.cond === 'new', 'newb', 'Новобудова', 'мережі з нуля, від стояків', 'data-set="cond" data-v="new"')}
+    ${card(W.cond === 'old', 'old', 'Вторинка', 'заміна старих труб', 'data-set="cond" data-v="old"')}</div>
+  <div class="wz-q">Опалення</div><div class="wz-cards" role="radiogroup">
+    ${card(W.heat === 'gas', 'gas', 'Газовий котел', 'конденсаційний 24 кВт, димохід', 'data-set="heat" data-v="gas"')}
+    ${card(W.heat === 'central', 'rad', 'Централізоване', 'без котла', 'data-set="heat" data-v="central"')}
+    ${card(W.heat === 'unknown', 'ask', 'Ще не вирішили', 'порахую котел, менеджер уточнить', 'data-set="heat" data-v="unknown"')}</div>
+  <div class="wz-q">Гаряча вода</div><div class="wz-cards" role="radiogroup">
+    ${hwOpts.map(([v, k, t, n]) => card(W.hw === v, k, t, n, `data-set="hw" data-v="${v}"`)).join('')}</div>`;
+}
+function vRooms(){
+  const rows = RTYPES.map(([t, name, , max, ic, hint]) => { const arr = W.rooms[t] || [], n = arr.length, [tc, tl] = tagOf(t);
+    return `<div class="wz-rt">${ico(ic)}
+      <div class="wz-rn"><b>${name}${n ? ` <span class="wz-tag ${tc}">${tl}</span>` : ''}</b><small>${hint || '&nbsp;'}</small></div>
+      ${stepper(name, n, max, `data-rm="${t}"`, `data-add="${t}"`)}
+      ${n ? `<div class="wz-areas">${arr.map((a, i) => `<label class="wz-area${+a > 0 ? '' : ' bad'}"><span>${esc(rName(t, i, n))}</span><input type="number" inputmode="decimal" min="0" step="0.1" value="${+a || ''}" data-area="${t}" data-i="${i}" aria-label="Площа: ${esc(rName(t, i, n))}"><em>м²</em></label>`).join('')}</div>` : ''}
+    </div>`; }).join('');
+  return `<h2 class="wz-h">Приміщення</h2><p class="wz-sub">Додайте кімнати й вкажіть площу кожної. Ми вже вписали типові площі, тож змініть їх на свої з плану.</p>
+    <div class="wz-rooms">${rows}</div>
+    <div class="wz-hint">${ico('info')}<span><b>Регламент майстра:</b> тепла підлога в кухні, вітальні, санвузлах, коридорі й на лоджії (крок 150 мм, контури до 85 м). У спальнях і дитячій ставимо радіатори з нижнім підключенням. Колектор і водопідготовка стоять на вході.</span></div>`;
+}
+function vWet(){
+  const L = wetList();
+  if(!L.length) return `<h2 class="wz-h">Санвузли</h2><p class="wz-sub">У списку приміщень немає жодного санвузла.</p><button class="btn" data-go="2">Додати на кроці «Приміщення»</button>`;
+  W.tab = Math.max(0, Math.min(W.tab, L.length - 1)); const w = L[W.tab], c = cfg(w), id = w.id;
+  const T = (k, ic, t, n) => card(!!c[k], ic, t, n, `data-tog="${k}" data-w="${id}"`, true);
+  const P2 = (k, v, label) => pill(String(c[k]) === String(v), label, `data-p="${k}" data-v="${v}" data-w="${id}"`);
+  const next = L[W.tab + 1];
+  return `<h2 class="wz-h">Санвузли</h2><p class="wz-sub">Позначте, що буде в кожному санвузлі: від цього залежать виводи води, каналізація й уся чистова.</p>
+  ${L.length > 1 ? `<div class="wz-tabs" role="tablist">${L.map((x, i) => `<button role="tab" aria-selected="${i === W.tab}" class="${i === W.tab ? 'on' : ''}" data-wt="${i}">${esc(wName(x))}<small>${x.a} м²</small></button>`).join('')}</div>` : ''}
+  <div class="wz-q">Що буде в приміщенні «${esc(wName(w))}»? <small>можна кілька</small></div>
+  <div class="wz-cards sm">
+    ${T('bath', 'bath', 'Ванна', '')}${T('shower', 'shower', 'Душ', 'зона з трапом')}${T('sink', 'sink', 'Умивальник', '')}
+    ${T('toilet', 'wc', 'Унітаз', 'на інсталяції')}${T('hyg', 'hyg', 'Гігієнічний душ', '')}${T('towel', 'towel', 'Рушникосушка', 'водяна + ТЕН')}
+    ${T('washer', 'washer', 'Пральна машина', '')}${T('bidet', 'bidet', 'Біде', '')}</div>
+  ${c.shower || c.bath || c.sink ? `<div class="wz-sub2">
+    ${c.shower ? `<div class="wz-row"><span class="wz-lbl">Душ</span><div class="wz-pills">${P2('showerHidden', true, 'Прихований, тропічний у стіні')}${P2('showerHidden', false, 'Душова стійка')}</div></div>` : ''}
+    ${c.bath ? `<div class="wz-row"><span class="wz-lbl">Змішувач ванни</span><div class="wz-pills">${P2('bathHidden', false, 'На стіні')}${P2('bathHidden', true, 'Прихований монтаж')}</div></div>` : ''}
+    ${c.sink ? `<div class="wz-row"><span class="wz-lbl">Умивальник</span><div class="wz-pills">${['накладний на стільницю', 'підвісний', 'меблевий'].map(v => P2('sinkMount', v, cap(v))).join('')}${P2('sinkN', 1, 'Одна чаша')}${P2('sinkN', 2, 'Дві чаші')}</div></div>` : ''}
+  </div>` : ''}
+  <div class="wz-q">Колір змішувачів і рушникосушки</div><div class="wz-pills">${MIX.map(([v, l, sw]) => pill(c.mix === v, l, `data-p="mix" data-v="${v}" data-w="${id}"`, sw)).join('')}</div>
+  ${c.sink || c.toilet || c.bidet ? `<div class="wz-q">Кераміка</div><div class="wz-pills">${CER.map(([v, l, sw]) => pill(c.cer === v, l, `data-p="cer" data-v="${v}" data-w="${id}"`, sw)).join('')}</div>` : ''}
+  ${next ? `<div class="wz-hint">${ico('info')}<span>Далі: <b>${esc(wName(next))}</b>. Кнопка «Далі» переведе до нього.</span></div>` : ''}`;
+}
+function vKit(){
+  const k = W.kit, has = W.rooms.kitchen.length;
+  const tog = (key, ic, t, n) => card(!!k[key], ic, t, n, `data-kt="${key}"`, true);
+  return `<h2 class="wz-h">Кухня і техніка</h2><p class="wz-sub">Мийка, техніка, якій потрібна вода, і кондиціонери з дренажем.</p>
+  ${has ? `<div class="wz-q">На кухні <small>можна кілька</small></div><div class="wz-cards sm">${tog('sink', 'ksink', 'Мийка', '')}${tog('dw', 'dw', 'Посудомийка', '')}${tog('washer', 'washer', 'Пральна машина', 'якщо стоїть на кухні')}</div>
+  ${k.sink ? `<div class="wz-sub2"><div class="wz-row"><span class="wz-lbl">Монтаж мийки</span><div class="wz-pills">${['врізна', 'під стільницю', 'накладна'].map(v => pill(k.mount === v, cap(v), `data-kp="mount" data-v="${v}"`)).join('')}</div></div>
+    <div class="wz-row"><span class="wz-lbl">Матеріал і колір мийки</span><div class="wz-pills">${KSINK.map(([v, l, sw]) => pill(k.color === v, l, `data-kp="color" data-v="${v}"`, sw)).join('')}</div></div>
+    <div class="wz-row"><span class="wz-lbl">Змішувач</span><div class="wz-pills">${MIX.slice(0, 4).map(([v, l, sw]) => pill(k.mix === v, l, `data-kp="mix" data-v="${v}"`, sw)).join('')}</div></div></div>` : ''}`
+  : `<div class="wz-hint">${ico('info')}<span>Кухні в списку немає. <button class="ghost sm" data-go="2">Додати кухню</button></span></div>`}
+  <div class="wz-q">Кондиціонери <small>дренаж у каналізацію через сифон</small></div>
+  <div class="wz-rooms"><div class="wz-rt">${ico('ac')}<div class="wz-rn"><b>Кондиціонер</b><small>внутрішні блоки</small></div>${stepper('Кондиціонери', W.ac, 8, 'data-ac="-1"', 'data-ac="1"')}</div></div>`;
+}
+function vSum(){
+  const d = live(), P = d.P, C = d.C || {};
+  const fx = Object.entries(P.fixtures.filter(f => f.type !== 'boiler').reduce((a, f) => (a[f.type] = (a[f.type] || 0) + 1, a), {})).map(([k, v]) => `${FX[k] || k}${v > 1 ? ' ×' + v : ''}`).join(', ');
+  const row = (dt, dd, go) => `<div><dt>${dt}</dt><dd>${dd}</dd><button data-go="${go}">Змінити</button></div>`;
+  return `<h2 class="wz-h">Ваш проєкт</h2><p class="wz-sub">Перевірте, допишіть побажання й запускайте. Специфікація з кодами й цінами буде готова за 1–3 хвилини.</p>
+  <dl class="wz-recap">
+    ${row('Об’єкт', esc(P.label), 1)}
+    ${row('Тепло і гаряча вода', `${esc(heatTxt())}; гаряча вода: ${esc(hwTxt())}`, 1)}
+    ${row('Приміщення', P.rooms.map(r => `${esc(r.name)} ${r.area} м²`).join(', ') || '—', 2)}
+    ${row('Сантехніка', esc(fx) || '—', 3)}
+    ${row('Інженерія', `${C.outlets || 0} виводів води · ${C.loops?.length ? `тепла підлога ${C.loops.length} конт. ≈ ${nf(C.loops.reduce((s, l) => s + l.m, 0))} м` : 'без теплої підлоги'} · ${C.beds ? `радіаторів: ${C.beds}` : 'без радіаторів'} · каналізація OSTENDORF`, 2)}
+  </dl>
+  <div class="wz-q">Побажання <small>бренди, бюджет, що вже куплено (необов’язково)</small></div>
+  <textarea class="wz-wish" id="wzWish" placeholder="напр.: змішувачі Grohe; котел вже є; труби пуш RAFTEC замість пайки">${esc(W.wish)}</textarea>
+  <div class="wz-get">
+    <div>${ico('table')}<b>Таблиця з цінами</b><small>коди 1С, кнопки копіювання</small></div>
+    <div>${ico('xls')}<b>Excel</b><small>вкладки по розділах</small></div>
+    <div>${ico('scheme')}<b>Схема мереж</b><small>вода, каналізація, ТП, шари</small></div>
+    <div>${ico('pdf')}<b>PDF-альбом</b><small>для майстра й клієнта</small></div>
+  </div>`;
+}
+function vSide(d){
+  const C = d.C || {}, tp = C.loops?.length ? nf(C.loops.reduce((s, l) => s + l.m, 0)) : 0;
+  return `<div class="wz-pan"><h3><span class="live"></span>Ваш проєкт</h3>
+    ${d.sc ? `<div class="wz-sch" data-a="zoom" title="Збільшити схему">${svgOf(d.sc)}</div>` : ''}
+    <div class="wz-kpi">
+      <div><b>${area()}</b><small>м² площа</small></div>
+      <div><b>${C.outlets || 0}</b><small>виводів води</small></div>
+      <div><b>${C.loops?.length || 0}</b><small>${tp ? `контурів ТП · ≈${tp} м` : 'контурів ТП'}</small></div>
+      <div><b>${C.beds || 0}</b><small>радіаторів</small></div>
+    </div>
+    <div class="wz-sum">${d.priced ? `<small>Труби, фітинги, каналізація, ТП</small><b>≈ ${nf(d.sum)} грн</b><small>${C.items?.length || 0} позицій у специфікації. Котел, бойлер, чистову й електрику підберу з прайсу під час розрахунку.</small>`
+      : `<small>${S.cat?.length ? 'Позицій у специфікації' : 'Прайс завантажується…'}</small><b>${C.items?.length || 0}</b><small>Суму порахую з актуального прайсу «Гарячої Точки».</small>`}</div></div>`;
+}
+const VIEWS = [vIntro, vObj, vRooms, vWet, vKit, vSum];
+
+function canNext(){
+  if(W.step === 2){ const all = Object.values(W.rooms).flat(); if(!all.length) return 'Додайте хоча б одне приміщення'; if(all.some(a => !(+a > 0))) return 'Вкажіть площу всіх приміщень'; }
+  return '';
+}
+function drawBar(d){
+  if(W.step === 0){ $w('wzBar').innerHTML = `<div class="wz-mini"><b>Майстер проєкту</b><small>5 кроків · якщо закриєте, відповіді збережуться</small></div><div class="wz-nav"><button class="btn" data-a="next">${W.max ? 'Продовжити' : 'Почати'} →</button></div>`; return; }
+  const why = canNext(), C = d.C || {}, last = W.step === STEPS.length;
+  $w('wzBar').innerHTML = `<button class="wz-mini" data-a="panel" aria-label="Показати схему і підсумок"><b>${area()} м² · ${C.outlets || 0} виводів · ТП ${C.loops?.length || 0} конт.</b>
+    <small>${why ? `<span class="wz-why">${why}</span>` : d.priced ? `труби й фітинги ≈ ${nf(d.sum)} грн<u> · схема</u>` : `${C.items?.length || 0} позицій<u> · схема</u>`}</small></button>
+    <div class="wz-nav"><button data-a="prev">Назад</button>${last ? `<button class="btn" data-a="run">Порахувати з цінами</button>` : `<button class="btn" data-a="next" ${why ? 'disabled' : ''}>Далі</button>`}</div>`;
+}
+let raf = 0;
+function refresh(){ cancelAnimationFrame(raf); raf = requestAnimationFrame(() => { const d = live(); if(W.step) $w('wzSide').innerHTML = vSide(d); drawBar(d); }); }
+function draw(top){
+  const st = W.step;
+  $w('wzT').innerHTML = st ? `Крок ${st} з ${STEPS.length} · <i>${STEPS[st - 1][1]}</i>` : 'Розрахунок інженерних мереж без креслень';
+  $w('wzProg').hidden = !st;
+  $w('wzProg').innerHTML = STEPS.map(([, l], i) => `<button class="wz-seg${i + 1 < st ? ' done' : ''}${i + 1 === st ? ' cur' : ''}" data-go="${i + 1}" ${i + 1 > Math.max(W.max, st) ? 'disabled' : ''} aria-label="Крок ${i + 1}: ${l}"${i + 1 === st ? ' aria-current="step"' : ''}><i></i><span>${l}</span></button>`).join('');
+  $w('wzGrid').classList.toggle('solo', !st); root.querySelector('.wz-reset').hidden = !st;
+  $w('wzSide').hidden = !st;
+  $w('wzBody').innerHTML = VIEWS[st]();
+  if(top) $w('wzMain').scrollTop = 0;
+  refresh(); keep();
+}
+function go(n){ W.step = Math.max(0, Math.min(STEPS.length, n)); W.max = Math.max(W.max, W.step); draw(true); }
+function toast(t){ const el = document.createElement('div'); el.className = 'wz-toast'; el.setAttribute('role', 'status'); el.textContent = t; root.appendChild(el); setTimeout(() => el.remove(), 3200); }
+
+// ── події ──
+root.addEventListener('click', e => {
+  const b = e.target.closest('button,[data-a]'); if(!b || !root.contains(b) || b.disabled) return;
+  const D = b.dataset;
+  if(D.a === 'close') return wizClose();
+  if(D.a === 'reset'){ let ok = true; try{ ok = confirm('Скинути всі відповіді майстра й почати спочатку?'); }catch{} if(!ok) return; W = def(); W.step = 1; W.max = 1; return draw(true); }
+  if(D.a === 'next'){ if(W.step === 3){ const L = wetList(); if(W.tab < L.length - 1){ W.tab++; return draw(true); } } return go(W.step + 1); }
+  if(D.a === 'prev'){ if(W.step === 3 && W.tab > 0){ W.tab--; return draw(true); } if(W.step === 4) W.tab = Math.max(0, wetList().length - 1); if(W.step === 2) W.tab = 0; return go(W.step - 1); }
+  if(D.a === 'run') return wizRun();
+  if(D.a === 'pdf'){ wizClose(); startWork(); setMode('project'); try{ shellRender(); }catch{} $('attBtn')?.click(); return; }
+  if(D.a === 'zoom') return zoom();
+  if(D.a === 'panel') return panel();
+  if(D.go){ if(+D.go === 3) W.tab = 0; return go(+D.go); }
+  if(D.wt){ W.tab = +D.wt; return draw(false); }
+  if(D.set){ W[D.set] = D.v;
+    if(D.set === 'heat'){ if(D.v === 'central' && W.hw === 'kotel') W.hw = 'central'; if(D.v !== 'central' && W.hw === 'central') W.hw = 'kotel'; }
+    return draw(false); }
+  if(D.add){ W.rooms[D.add].push(RTYPES.find(r => r[0] === D.add)[2]); return draw(false); }
+  if(D.rm){ const t = D.rm; W.rooms[t].pop(); if(t === 'bath' || t === 'wc') delete W.wet[t + W.rooms[t].length]; return draw(false); }
+  if(D.tog){ const c = W.wet[D.w]; if(c){ c[D.tog] = !c[D.tog]; } return draw(false); }
+  if(D.p){ const c = W.wet[D.w]; if(c) c[D.p] = /Hidden$/.test(D.p) ? D.v === 'true' : D.p === 'sinkN' ? +D.v : D.v; return draw(false); }
+  if(D.kt){ W.kit[D.kt] = !W.kit[D.kt]; return draw(false); }
+  if(D.kp){ W.kit[D.kp] = D.v; return draw(false); }
+  if(D.ac){ W.ac = Math.max(0, Math.min(8, W.ac + +D.ac)); return draw(false); }
+});
+root.addEventListener('input', e => {
+  const t = e.target;
+  if(t.dataset.area){ const v = parseFloat(String(t.value).replace(',', '.')); W.rooms[t.dataset.area][+t.dataset.i] = isFinite(v) && v > 0 ? Math.round(v * 10) / 10 : 0;
+    t.closest('.wz-area').classList.toggle('bad', !(v > 0)); keep(); refresh(); }
+  if(t.id === 'wzWish'){ W.wish = t.value.slice(0, 1500); keep(); }
+});
+root.addEventListener('keydown', e => {
+  if(e.key !== 'Escape') return; const o = root.querySelector('.wz-zoom,.wz-msheet'); if(o) o.remove(); else wizClose(); });
+function zoom(){ const d = live(); if(!d.sc) return; const z = document.createElement('div'); z.className = 'wz-zoom'; z.innerHTML = `<div>${svgOf(d.sc)}</div>`;
+  z.onclick = () => z.remove(); root.appendChild(z); }
+function panel(){ if(matchMedia('(min-width:961px)').matches) return; const m = document.createElement('div'); m.className = 'wz-msheet';
+  m.innerHTML = `<div><div class="wz-mhead"><b>Схема і підсумок</b><button class="ghost sm" data-x>Закрити</button></div>${vSide(live())}</div>`;
+  m.addEventListener('click', e => { e.stopPropagation(); if(e.target.closest('[data-a="zoom"]')) return zoom(); if(e.target === m || e.target.closest('[data-x]')) m.remove(); });
+  root.appendChild(m); }
+
+function wizOpen(){
+  if($('tileSheet')) $('tileSheet').hidden = true; if($('capsSheet')) $('capsSheet').hidden = true;
+  try{ drawerClose(); }catch{}
+  root.hidden = false; document.body.classList.add('wzOn'); draw(true);
+  setTimeout(() => (root.querySelector('.wz-go') || root.querySelector('.wz-nav .btn'))?.focus({ preventScroll:true }), 40);
+  if(!S.cat?.length && S.catPromise) S.catPromise.then(() => { if(!root.hidden) refresh(); });
+}
+function wizClose(){ root.hidden = true; document.body.classList.remove('wzOn'); root.querySelectorAll('.wz-zoom,.wz-msheet,.wz-toast').forEach(x => x.remove()); keep();
+  if(location.hash === '#majster') history.replaceState(null, '', location.pathname + location.search); }
+window.wizOpen = wizOpen;
+
+// ── запуск розрахунку: та сама дорога, що й «Надіслати» в чаті ──
+async function wizRun(){
+  const P = buildP(), said = summary(P);
+  if(!P.rooms.length) return toast('Додайте приміщення');
+  if(!apiKey()){ wizClose(); return mmGate('register'); }
+  if(S.busy) return toast('Зачекайте, попередній розрахунок ще йде');
+  if(isClient() && !S.ctx.object){ wizClose(); showErr('Спершу оберіть або створіть об’єкт, щоб менеджер побачив запит. Потім знову відкрийте «Майстер проєкту»: усі відповіді збережено.'); openClients(); return; }
+  wizClose(); startWork(); setMode('project'); try{ shellRender(); }catch{}
+  if(!S.cat.length || !S.mx){ showErr('Чекаю на прайс…'); await S.catPromise; hideErr(); if(!S.cat.length) return showErr('Прайс не завантажився. Оновіть сторінку.'); }
+  $('hero').hidden = true; $('cards').hidden = true;
+  addMsg({ role:'me', text:said });
+  S.busy = true; $('send').disabled = true;
+  const wait = addMsg({ role:'ai', typing:'Рахую проєкт…' }); wait.wizP = P; wait.said = said;
+  try{ await calc(said, null, wait); }
+  catch(e){ wait.typing = null; wait.text = 'Щось пішло не так: ' + (e.message || e); render(); }
+  finally{ delete wait.wizP; S.busy = false; $('send').disabled = false; save(); }
+  try{ await hpAfterSend(null, wait); }catch{}
+  try{ hpUsage(); }catch{}
+}
+
+// ── входи в майстер ──
+document.addEventListener('click', e => { const b = e.target.closest('[data-wiz]'); if(!b) return; e.preventDefault(); e.stopPropagation(); wizOpen(); }, true);
+$('cards')?.insertAdjacentHTML('afterbegin', `<button class="wz-ban" data-wiz><span class="wz-ban-ic">${ico('flat')}</span><span class="wz-ban-t"><small>Новинка · без креслень</small><b>Майстер проєкту: інженерка квартири за 2 хвилини</b><span>Оберіть кімнати, санвузли й колір змішувачів і отримайте специфікацію з цінами, схему мереж і PDF.</span></span><span class="wz-ban-go">Почати →</span></button>`);
+const tp = document.querySelector('.tpanel[data-panel="project"]');
+if(tp){ const row = tp.querySelector('.row'), old = row?.querySelector('[data-start]');
+  if(old){ old.classList.remove('btn'); old.textContent = 'Надіслати PDF'; }
+  row?.insertAdjacentHTML('afterbegin', '<button class="btn" data-wiz>Покроковий майстер</button>');
+  tp.querySelector('p')?.insertAdjacentHTML('beforeend', ' <b>Немає PDF?</b> Пройдіть покроковий майстер: 5 кроків, картинками, без креслень.'); }
+document.querySelectorAll('#capsSheet .cblk').forEach(s => { const st = s.querySelector('[data-start="project"]'); if(!st) return; st.classList.remove('btn'); s.querySelector('.row')?.insertAdjacentHTML('afterbegin', '<button class="btn" data-wiz>Майстер без PDF</button>'); });
+$('introStart')?.insertAdjacentHTML('afterend', '<button class="i-wiz" data-wiz>Порахувати проєкт за 2 хв →</button>');
+// пряме посилання: mm.html#majster (можна давати клієнтам)
+if(location.hash === '#majster') setTimeout(wizOpen, 300);
+addEventListener('hashchange', () => { if(location.hash === '#majster') wizOpen(); });
+})();
+</script>
+
 </body>
 </html>
