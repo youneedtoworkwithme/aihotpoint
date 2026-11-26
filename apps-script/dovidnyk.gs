@@ -15,6 +15,7 @@
 const DOC_ID   = '1VEr9AJGphtLcesIItjsDHs-f2Rc3oJ9F3kTz9iAb-as';           // «Довідник ГТ — база знань»
 const SHEET_ID = '10uX5SjNpgZu3ss61UbjLQ6Jwmuwu0M-VZ1gSHBzogI8';           // таблиця з вкладкою «Доставка»
 const FOLDER_ID = '1W4oMy3_ERUpbFWPcY5mILMZtBj9VjeSZ';                     // «РОЗРОБКА ШІ ХОТПОІНТ»
+const ROUTES_DOC = '1GKljrC0eUdNL80w2KNiXRVVyJGiez0YbWxVSd2G1QUA';    // «Маршрути доставки ДЦ — для NotebookLM»
 // безкоштовні моделі Gemini API, по черзі: якщо одна вичерпала ліміт (429) або недоступна — береться наступна
 const MODELS = ['gemini-3.8-flash', 'gemini-3.6-flash', 'gemini-3.5-flash-lite', 'gemini-flash-latest', 'gemini-flash-lite-latest'];
 const P = PropertiesService.getScriptProperties();
@@ -122,7 +123,7 @@ function syncRoutes(){
   const rows = sh.getRange(2, 1, sh.getLastRow() - 1, 3).getValues().filter(r => r[1] && r[2]);
   const order = ['Понеділок', 'Вівторок', 'Середа', 'Четвер', "П'ятниця", 'Субота', 'Неділя'], by = {};
   for(const [route, zone, day] of rows){ const z = String(zone).trim(); if(!by[z]) by[z] = {}; if(!by[z][day]) by[z][day] = new Set(); by[z][day].add(String(route).replace(/\s+/g, ' ').trim()); }
-  let id = P.getProperty('ROUTES_DOC_ID'), doc;
+  let id = P.getProperty('ROUTES_DOC_ID') || ROUTES_DOC, doc;
   if(id){ try{ doc = DocumentApp.openById(id); }catch(e){ id = null; } }
   if(!id){ doc = DocumentApp.create('Маршрути доставки ДЦ — для NotebookLM'); DriveApp.getFileById(doc.getId()).moveTo(DriveApp.getFolderById(FOLDER_ID)); P.setProperty('ROUTES_DOC_ID', doc.getId()); }
   const body = doc.getBody(); body.clear();
@@ -141,7 +142,7 @@ function setup(){
   ScriptApp.getProjectTriggers().filter(t => t.getHandlerFunction() === 'syncRoutes').forEach(t => ScriptApp.deleteTrigger(t));
   ScriptApp.newTrigger('syncRoutes').timeBased().everyDays(1).atHour(6).create();
   const md = kbMarkdown_(), n = cards_(md).length;
-  Logger.log('Довідник: %s карток. Маршрути: https://docs.google.com/document/d/%s', n, P.getProperty('ROUTES_DOC_ID'));
+  Logger.log('Довідник: %s карток. Маршрути: https://docs.google.com/document/d/%s', n, P.getProperty('ROUTES_DOC_ID') || ROUTES_DOC);
   if(!P.getProperty('GEMINI_KEY')) Logger.log('⚠️ Додайте GEMINI_KEY у Властивості скрипта (ключ з https://aistudio.google.com/apikey)');
   else Logger.log('Тест: %s', JSON.stringify(ask_({ q:'До кого звернутись по видатковій?', staff:true, name:'setup' })).slice(0, 500));
 }
