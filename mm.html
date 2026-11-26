@@ -1045,7 +1045,7 @@ const $ = id => document.getElementById(id);
 // ТЕСТ: модель MiniMax M3.1 Flash. Ключ MiniMax → напряму api.minimax.io; ключ OpenRouter (sk-or-…) → через openrouter.ai.
 // ── Автооновлення: одне постійне посилання без ?v=. Сторінка сама перевіряє, чи на GitHub не вийшла новіша версія,
 // і тихо перезавантажується (адреса в рядку браузера лишається та сама). При кожному оновленні міняти APP_VER.
-const APP_VER = '2026-11-26.7';
+const APP_VER = '2026-11-26.8';
 const HP_SHOWROOM = { schedule:'Пн–Пт 09:00–18:00', address:'Львів, вул. Зелена, 238, корпус «В»' };
 const HP_MANAGERS = [
   { id:'vlad', name:'Владислав Гірняк', role:'Менеджер', phones:['+38 (067) 534 59 41','+38 (063) 334 36 54'], email:'HirniakVO@hot-point.com.ua', tg:'https://t.me/Manaaggerr03', viber:'+380675345941', url:'https://youneedtoworkwithme.github.io/vlad/' },
@@ -4804,6 +4804,7 @@ function openKB(q0){
       if(!text){
         if(KB_GS){
           const res = await fetch(KB_GS, { method:'POST', body:JSON.stringify({ action:'ask', token:apiKey(), q, history:hist.slice(-6).map(m => ({ role:m.role, text:m.text })), route }) }).then(r => r.json());
+          if(res.status === 401){ try{ localStorage.removeItem('hpuser'); }catch{} if(typeof mmGate === 'function') mmGate('register'); throw new Error('Увійдіть у Hotpoint.ai, щоб користуватися довідником.'); }
           if(!res.ok) throw new Error(res.error || 'Довідник не відповів');
           text = res.text; KB.model = res.model;
         } else {
@@ -4828,7 +4829,8 @@ window.hpKB = { load:kbLoad, search:q => kbLoad().then(() => search(q)), route:q
 if(typeof SH_I !== 'undefined') SH_I.kb = 'M4 4h11a3 3 0 0 1 3 3v13H7a3 3 0 0 1-3-3zM4 17a3 3 0 0 1 3-3h11M9 8h5';
 if(typeof tabGo === 'function'){ const _tg = tabGo; tabGo = function(k){ if(k === 'kb'){ try{ startWork(); }catch{} S.tab = 'kb'; NAV.length = 0; window.openKB(); tabsMark(); return; } return _tg(k); }; }
 if(typeof S !== 'undefined' && S.me && typeof tabsRender === 'function') tabsRender();
-const goHash = () => { if(location.hash === '#dovidnyk') setTimeout(() => window.openKB(), 300); };
+// чекаємо, поки сайт дізнається, хто увійшов (інакше персонал на мить бачить лише публічні картки)
+const goHash = () => { if(location.hash !== '#dovidnyk') return; let n = 0; const t = setInterval(() => { if((typeof S !== 'undefined' && S.me) || ++n > 40){ clearInterval(t); window.openKB(); } }, 250); };
 goHash(); addEventListener('hashchange', goHash);
 })();
 </script>
