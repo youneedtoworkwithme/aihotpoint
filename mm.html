@@ -1045,7 +1045,7 @@ const $ = id => document.getElementById(id);
 // ТЕСТ: модель MiniMax M3.1 Flash. Ключ MiniMax → напряму api.minimax.io; ключ OpenRouter (sk-or-…) → через openrouter.ai.
 // ── Автооновлення: одне постійне посилання без ?v=. Сторінка сама перевіряє, чи на GitHub не вийшла новіша версія,
 // і тихо перезавантажується (адреса в рядку браузера лишається та сама). При кожному оновленні міняти APP_VER.
-const APP_VER = '2026-11-26.8';
+const APP_VER = '2026-11-26.9';
 const HP_SHOWROOM = { schedule:'Пн–Пт 09:00–18:00', address:'Львів, вул. Зелена, 238, корпус «В»' };
 const HP_MANAGERS = [
   { id:'vlad', name:'Владислав Гірняк', role:'Менеджер', phones:['+38 (067) 534 59 41','+38 (063) 334 36 54'], email:'HirniakVO@hot-point.com.ua', tg:'https://t.me/Manaaggerr03', viber:'+380675345941', url:'https://youneedtoworkwithme.github.io/vlad/' },
@@ -4530,30 +4530,95 @@ addEventListener('hashchange', () => { if(location.hash === '#majster') wizOpen(
 .kb-src .kb-it:hover,.kb-src .kb-it.on{background:var(--tint);color:var(--brand-ink)}
 .kb-src .kb-it i{font-style:normal;color:var(--warn,#8A5A00)}
 .kb-opts{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
-.kbc{height:calc(100dvh - 140px);min-height:420px}
-.kbc .kb-main{display:flex;flex-direction:column;min-height:0;height:100%}
-.kbc .kb-src{max-height:100%;overflow:auto}
-.kb-feed{flex:1;min-height:0;overflow:auto;display:flex;flex-direction:column;gap:12px;padding:4px 2px 12px}
-.kbm{max-width:92%}.kbm.me{align-self:flex-end}.kbm.ai{align-self:flex-start}
-#kbFeed .kbm.me .bub{background:var(--graphite)!important;color:var(--on-graphite,#fff)!important;opacity:1!important;padding:9px 14px!important;border:0!important;border-radius:16px 16px 4px 16px!important;font-size:14.5px;white-space:pre-wrap;box-shadow:none!important}
-.kbm.ai{background:var(--surface);border:1px solid var(--line);border-radius:16px 16px 16px 4px;padding:10px 14px}
-.kbm .who{font-size:11.5px;font-weight:800;color:var(--brand-ink);text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px}
-.kb-route{margin-top:8px;font-size:13px;background:var(--tint);border-radius:10px;padding:6px 10px}
-.kb-cites{margin-top:8px;font-size:12.5px;color:var(--muted)}.kb-cites summary{cursor:pointer}
-.kb-cites .kb-ans{margin:8px 0 0;font-size:13px}
-.kb-typing{display:flex;align-items:center;gap:4px;color:var(--muted);font-size:13px}
-.kb-typing i{width:6px;height:6px;border-radius:50%!important;background:var(--brand);animation:kbDot 1s infinite ease-in-out}.kb-typing i:nth-child(2){animation-delay:.15s}.kb-typing i:nth-child(3){animation-delay:.3s}.kb-typing span{margin-left:6px}
-@keyframes kbDot{0%,100%{opacity:.25;transform:translateY(0)}50%{opacity:1;transform:translateY(-3px)}}
-.kb-comp{display:flex;gap:6px;align-items:flex-end;border:1.5px solid var(--line);border-radius:16px;background:var(--surface);padding:6px}
-.kb-comp:focus-within{border-color:var(--brand)}
-.kb-comp textarea{flex:1;min-width:0;border:0;outline:0;resize:none;font:inherit;font-size:16px;line-height:1.4;padding:7px 8px;background:transparent;color:var(--fg);max-height:160px}
-.kb-foot{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:12px;color:var(--muted);padding:6px 2px 0}
-.kb-foot button{font-size:12.5px;padding:4px 10px;white-space:nowrap;flex:none}
-.kb-hello{padding:10px 4px}.kb-hello b{font-size:18px}.kb-hello p{color:var(--muted);margin:6px 0 12px;max-width:620px}
-.kb-hello .kb-chips{flex-wrap:wrap!important}
-.kb-pop{position:absolute;inset:0;z-index:20;background:rgba(20,20,20,.35);display:flex;align-items:center;justify-content:center;padding:16px}
-.kb-pop[hidden]{display:none}.kb-popin{background:var(--bg);border-radius:16px;padding:14px;max-width:640px;width:100%;max-height:85%;overflow:auto;display:flex;flex-direction:column;gap:10px}
-@media (max-width:900px){.kbc{height:calc(100dvh - 190px)}.kbc .kb-src{display:none}}
+.kbc{height:calc(100dvh - 150px);min-height:440px;grid-template-columns:minmax(0,1fr) 300px;gap:18px}
+.kbc .kb-main{display:flex;flex-direction:column;min-height:0;height:100%;background:var(--sunk);border:1px solid var(--line);border-radius:22px;overflow:hidden}
+.kbc .kb-src{max-height:100%;overflow:auto;background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:16px 14px}
+/* шапка */
+.kb-top{display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--surface);border-bottom:1px solid var(--line)}
+.kb-logo{width:40px;height:40px;flex:none;border-radius:12px!important;background:linear-gradient(135deg,var(--brand),#E0461A);display:grid;place-items:center;color:#fff;box-shadow:0 4px 12px rgba(242,103,58,.28)}
+.kb-logo svg{width:22px;height:22px}
+.kb-tt{flex:1;min-width:0}.kb-tt b{display:block;font-size:16px;line-height:1.2}
+.kb-tt span{display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kb-tt span i{width:7px;height:7px;border-radius:50%!important;background:var(--ok);flex:none;box-shadow:0 0 0 3px color-mix(in srgb,var(--ok) 20%,transparent)}
+.kb-tb{display:flex;gap:6px;flex:none}
+.kb-tb a,.kb-tb button{all:unset;box-sizing:border-box;cursor:pointer;display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 12px;border:1px solid var(--line);border-radius:10px!important;font-size:13px;font-weight:600;color:var(--fg);background:var(--surface);white-space:nowrap}
+.kb-tb a:hover,.kb-tb button:hover{border-color:var(--brand);color:var(--brand-ink)}
+.kb-tb svg{width:16px;height:16px;flex:none}
+@media (max-width:700px){.kb-tb .lbl{display:none}.kb-tb a,.kb-tb button{padding:0 9px}}
+/* стрічка */
+.kb-feed{flex:1;min-height:0;overflow:auto;display:flex;flex-direction:column;gap:18px;padding:22px 22px 12px;scroll-behavior:smooth}
+.kb-feed>*{width:100%;max-width:780px;margin-left:auto;margin-right:auto}
+.kbm{display:flex;gap:10px;align-items:flex-start}
+.kbm.me{justify-content:flex-end}
+#kbFeed .kbm.me .bub{max-width:78%;background:var(--graphite)!important;color:var(--on-graphite,#fff)!important;opacity:1!important;padding:10px 15px!important;border:0!important;border-radius:18px 18px 6px 18px!important;font-size:14.5px;line-height:1.5;white-space:pre-wrap;box-shadow:none!important}
+.kb-av{width:30px;height:30px;flex:none;border-radius:10px!important;background:var(--tint);color:var(--brand-ink);display:grid;place-items:center;font-size:11px;font-weight:800;letter-spacing:.02em;margin-top:2px}
+.kb-body{flex:1;min-width:0;background:var(--surface);border:1px solid var(--line);border-radius:6px 18px 18px 18px;padding:13px 16px;box-shadow:0 1px 2px rgba(0,0,0,.04)}
+.kbm.err .kb-body{border-color:var(--warn);background:var(--warn-bg)}
+.kb-txt{font-size:14.5px;line-height:1.6;overflow-wrap:anywhere}
+.kb-txt h4{font-size:14.5px;margin:10px 0 4px}
+.kb-txt code{background:var(--sunk);border-radius:5px;padding:0 4px;font-size:13px}
+.kb-cite.site{background:var(--graphite);color:var(--on-graphite,#fff)}
+.kb-srcs{display:flex;flex-wrap:wrap;gap:6px;margin-top:11px;padding-top:10px;border-top:1px dashed var(--line)}
+.kb-srcs>span{font-size:11.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;align-self:center;margin-right:2px}
+.kb-sc{all:unset;box-sizing:border-box;cursor:pointer;display:inline-flex;align-items:center;gap:6px;max-width:100%;font-size:12.5px;padding:4px 10px 4px 4px;border:1px solid var(--line);border-radius:999px!important;background:var(--sunk);color:var(--fg)}
+.kb-sc:hover{border-color:var(--brand);color:var(--brand-ink)}
+.kb-sc b{display:inline-grid;place-items:center;min-width:20px;height:20px;border-radius:999px!important;background:var(--brand);color:var(--on-brand);font-size:11px;padding:0 5px}
+.kb-sc em{font-style:normal;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:240px}
+.kb-act{display:flex;gap:4px;margin-top:8px}
+.kb-act button{all:unset;cursor:pointer;font-size:12px;color:var(--muted);padding:3px 8px;border-radius:7px!important}
+.kb-act button:hover{background:var(--sunk);color:var(--fg)}
+.kb-route{margin-top:10px;font-size:13px;background:var(--tint);border-radius:10px;padding:8px 11px;display:flex;gap:8px}
+/* думає + порада */
+.kb-think{display:flex;align-items:center;gap:8px;font-size:13.5px;color:var(--muted);font-weight:600}
+.kb-think .sp{width:16px;height:16px;border-radius:50%!important;border:2px solid var(--line);border-top-color:var(--brand);animation:kbSpin .8s linear infinite}
+@keyframes kbSpin{to{transform:rotate(360deg)}}
+.kb-tip{margin-top:12px;border-radius:14px;background:linear-gradient(135deg,var(--tint),color-mix(in srgb,var(--tint) 40%,var(--surface)));border:1px solid color-mix(in srgb,var(--brand) 25%,var(--line));padding:12px 14px 10px;position:relative;overflow:hidden}
+.kb-tip .h{display:flex;align-items:center;gap:6px;font-size:11.5px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--brand-ink);margin-bottom:5px}
+.kb-tip .h svg{width:15px;height:15px}
+.kb-tip p{margin:0;font-size:14px;line-height:1.55;color:var(--fg);animation:kbIn .5s ease}
+.kb-tip .bar{position:absolute;left:0;bottom:0;height:3px;background:var(--brand);opacity:.55;animation:kbBar linear forwards}
+@keyframes kbBar{from{width:0}to{width:100%}}
+@keyframes kbIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.kb-tip.pin{background:var(--sunk);border-color:var(--line);margin:0 0 0 40px;padding:9px 13px}
+.kb-tip.pin .h{color:var(--muted)}.kb-tip.pin p{font-size:13.5px;color:var(--muted);animation:none}
+/* привітання */
+.kb-hello{padding:18px 0 6px}
+.kb-hello .hi{display:flex;align-items:center;gap:12px;margin-bottom:6px}
+.kb-hello .hi b{font-size:22px;letter-spacing:-.01em}
+.kb-hello>p{color:var(--muted);margin:0 0 18px;max-width:620px;font-size:14.5px;line-height:1.55}
+.kb-topics{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
+.kb-topic{all:unset;box-sizing:border-box;cursor:pointer;display:flex;gap:11px;align-items:flex-start;padding:13px 14px;border:1px solid var(--line);border-radius:16px!important;background:var(--surface);transition:border-color .15s,transform .15s,box-shadow .15s}
+.kb-topic:hover{border-color:var(--brand);transform:translateY(-1px);box-shadow:0 6px 18px rgba(0,0,0,.06)}
+.kb-topic .ti{width:34px;height:34px;flex:none;border-radius:10px!important;background:var(--tint);color:var(--brand-ink);display:grid;place-items:center}
+.kb-topic .ti svg{width:18px;height:18px}
+.kb-topic small{display:block;font-size:11.5px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-bottom:2px}
+.kb-topic span{display:block;font-size:14px;line-height:1.4;font-weight:600;color:var(--fg)}
+/* поле вводу */
+.kb-dock{padding:10px 22px 14px;background:linear-gradient(to top,var(--sunk) 70%,transparent)}
+.kb-dock>*{max-width:780px;margin-left:auto;margin-right:auto}
+.kb-comp{display:flex;gap:6px;align-items:flex-end;border:1.5px solid var(--line);border-radius:20px;background:var(--surface);padding:7px 7px 7px 10px;box-shadow:0 4px 18px rgba(0,0,0,.06)}
+.kb-comp:focus-within{border-color:var(--brand);box-shadow:0 4px 18px rgba(242,103,58,.14)}
+.kb-comp textarea{flex:1;min-width:0;border:0;outline:0;resize:none;font:inherit;font-size:15.5px;line-height:1.45;padding:7px 4px;background:transparent;color:var(--fg);max-height:160px}
+.kb-comp .btn.ic{width:40px;height:40px;border-radius:14px!important;padding:0;display:grid;place-items:center}
+.kb-comp .btn.ic svg{width:20px;height:20px}
+.kb-foot{display:flex;justify-content:center;gap:14px;font-size:11.5px;color:var(--muted);padding:8px 2px 0;text-align:center}
+@media (max-width:640px){.kb-foot .kbd{display:none}.kb-feed{padding:16px 12px 10px}.kb-dock{padding:8px 10px 10px}.kb-tip.pin{margin-left:0}}
+/* джерела */
+.kb-src h5{display:flex;align-items:center;justify-content:space-between;margin:0 0 10px;font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.kb-src h5 em{font-style:normal;background:var(--sunk);border-radius:999px!important;padding:2px 9px;font-size:11.5px;color:var(--fg)}
+.kb-src details{border:0;padding:0;margin-bottom:4px}
+.kb-src summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;font-weight:700;font-size:13px;padding:7px 8px;border-radius:9px}
+.kb-src summary::-webkit-details-marker{display:none}
+.kb-src summary:hover{background:var(--sunk)}
+.kb-src summary span{color:var(--muted);font-weight:600}
+.kb-src .kb-it{all:unset;box-sizing:border-box;display:flex;gap:8px;align-items:flex-start;width:100%;cursor:pointer;font-size:13px;line-height:1.35;padding:6px 8px 6px 14px;border-radius:9px}
+.kb-src .kb-it:before{content:'';width:5px;height:5px;border-radius:50%;background:var(--line);margin-top:6px;flex:none}
+.kb-src .kb-it:hover,.kb-src .kb-it.on{background:var(--tint);color:var(--brand-ink)}
+.kb-src .kb-it.on:before{background:var(--brand)}
+.kb-src .kb-it i{font-style:normal;margin-left:auto;flex:none;width:7px;height:7px;border-radius:50%;background:var(--warn);margin-top:5px}
+.kb-pop{position:fixed;inset:0;z-index:200;background:rgba(20,20,20,.4);display:flex;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(2px)}
+.kb-pop[hidden]{display:none}.kb-popin{background:var(--bg);border-radius:20px;padding:16px;max-width:660px;width:100%;max-height:85%;overflow:auto;display:flex;flex-direction:column;gap:12px;box-shadow:0 20px 50px rgba(0,0,0,.25)}
+@media (max-width:900px){.kbc{height:calc(100dvh - 170px);grid-template-columns:minmax(0,1fr)}.kbc .kb-src{display:none}}
 .kb-flash{animation:kbFlash 1.2s ease}
 @keyframes kbFlash{0%{box-shadow:0 0 0 3px var(--brand)}100%{box-shadow:0 0 0 0 transparent}}
 </style>
@@ -4692,13 +4757,18 @@ function routeAnswer(q){
 
 // ── Показ ──
 function rich(s){
-  const inl = t => esc(t).replace(/(https?:\/\/[^\s<]+[^\s<.,;:)!?»])/g, '<a href="$1" target="_blank" rel="noopener">$1</a>').replace(/\*\*(.+?)\*\*/g, '<b>$1</b>')
+  const inl = t => esc(t).replace(/\[([^\]]{1,200})\]\((https?:\/\/[^\s)]+)\)/g, (m, x, u) => '\u0001' + encodeURIComponent(u) + '\u0002' + x + '\u0003')
+    .replace(/(https?:\/\/[^\s<\u0001-\u0003]+[^\s<.,;:)!?»\u0001-\u0003])/g, u => `<a href="${u}" target="_blank" rel="noopener">${u.replace(/^https?:\/\/(www\.)?/, '').slice(0, 48)}${u.replace(/^https?:\/\/(www\.)?/, '').length > 48 ? '…' : ''}</a>`)
+    .replace(/\u0001([^\u0002]+)\u0002([^\u0003]*)\u0003/g, (m, u, x) => `<a href="${decodeURIComponent(u)}" target="_blank" rel="noopener">${/^https?:/.test(x) ? 'відкрити на сайті ↗' : x}</a>`)
+    .replace(/\[С(\d{1,2})\]/g, '<span class="kb-cite site" title="Сайт hot-point.com.ua">С$1</span>').replace(/\*\*(.+?)\*\*/g, '<b>$1</b>')
     .replace(/`([^`]+)`/g, '<code>$1</code>').replace(/❓([^.\n]*)/g, '<span class="todo">❓$1</span>').replace(/\[(\d{1,2}(?:\s*,\s*\d{1,2})*)\]/g, (m, g) => g.split(/\s*,\s*/).map(n => `<button class="kb-cite" data-cite="${n}">${n}</button>`).join(''));
   const out = []; let list = null;
   for(const ln of String(s).split('\n')){
     const ul = ln.match(/^\s*[-•*]\s+(.*)/), ol = ln.match(/^\s*\d+[.)]\s+(.*)/);
     if(ul || ol){ const t = ul ? 'ul' : 'ol'; if(list !== t){ if(list) out.push(`</${list}>`); out.push(`<${t}>`); list = t; } out.push(`<li>${inl((ul || ol)[1])}</li>`); continue; }
     if(list){ out.push(`</${list}>`); list = null; }
+    const hd = ln.match(/^\s*#{1,4}\s+(.*)/);
+    if(hd){ out.push(`<h4>${inl(hd[1])}</h4>`); continue; }
     if(ln.trim()) out.push(`<p>${inl(ln)}</p>`);
   }
   if(list) out.push(`</${list}>`);
@@ -4706,8 +4776,52 @@ function rich(s){
 }
 const cardHtml = (c, n) => `<div class="kb-ans" id="kbc${c.id}" data-card="${c.id}"><h4>${n ? `<span class="kb-cite">${n}</span>` : ''}${esc(c.title)}<small>${esc(c.sec)}${c.aud === 'staff' ? ' · для персоналу' : ''}</small></h4>
   <div class="kb-txt">${rich(c.text)}</div><div class="kb-meta"><span>Джерело: ${esc(c.src || '—')}</span>${c.upd ? `<span>оновлено ${esc(c.upd)}</span>` : ''}<button class="ghost" data-fix="${c.id}">Запропонувати правку</button></div></div>`;
-const CHIPS_STAFF = ['До кого звернутись, якщо треба видаткова?', 'Коли доставка в Самбір?', 'Коли машина з ДЦ на Львів?', 'Клієнт каже «є свій постачальник» — що відповісти?', 'Брак насоса Tatra — що робити?', 'Як знайти документ у КУП?', 'Що казати клієнту про нашу компанію?'];
-const CHIPS_CLIENT = ['Коли доставка і скільки коштує?', 'Хто ви як компанія?', 'Адреса і графік магазину', 'З якими виробниками працюєте?', 'Контакти менеджерів'];
+const KB_IC = {
+  doc:'<path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5M10 13h6M10 17h6"/>',
+  truck:'<path d="M3 6h11v10H3zM14 10h4l3 3v3h-7"/><circle cx="7" cy="17.5" r="1.8"/><circle cx="17" cy="17.5" r="1.8"/>',
+  box:'<path d="M3 8l9-5 9 5v8l-9 5-9-5z"/><path d="M3 8l9 5 9-5M12 13v8"/>',
+  chat:'<path d="M4 5h16v11H9l-5 4z"/><path d="M8 10h8"/>',
+  tool:'<path d="M14.5 6.5a4 4 0 0 0-5.3 5.3L4 17l3 3 5.2-5.2a4 4 0 0 0 5.3-5.3l-2.6 2.6-2.4-.6-.6-2.4z"/>',
+  monitor:'<path d="M3 5h18v11H3zM9 20h6M12 16v4"/>',
+  star:'<path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/>',
+  pin:'<path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/>',
+  phone:'<path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/>',
+  book:'<path d="M4 4h11a3 3 0 0 1 3 3v13H7a3 3 0 0 1-3-3z"/><path d="M4 17a3 3 0 0 1 3-3h11M9 8h5"/>',
+  bulb:'<path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2V16h5v-.1c0-.8.4-1.5 1-2A6 6 0 0 0 12 3z"/>'
+};
+const kbIc = k => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${KB_IC[k] || ''}</svg>`;
+const TOPICS_STAFF = [
+  ['doc', 'Документи', 'До кого звернутись, якщо треба видаткова?'],
+  ['truck', 'Доставка', 'Коли доставка в Самбір?'],
+  ['box', 'Логістика ДЦ', 'Коли машина з ДЦ на Львів?'],
+  ['chat', 'Заперечення', 'Клієнт каже «є свій постачальник» — що відповісти?'],
+  ['tool', 'Гарантія і брак', 'Брак насоса Tatra — що робити?'],
+  ['monitor', 'КУП', 'Як знайти документ у КУП?']];
+const TOPICS_CLIENT = [
+  ['truck', 'Доставка', 'Коли доставка і скільки коштує?'],
+  ['star', 'Про нас', 'Хто ви як компанія?'],
+  ['pin', 'Магазин', 'Адреса і графік магазину'],
+  ['box', 'Бренди', 'З якими виробниками працюєте?'],
+  ['phone', 'Контакти', 'Контакти менеджерів']];
+// Поради менеджеру, поки довідник думає (загальні принципи продажу, без фактів про компанію)
+const KB_TIPS = [
+  'Перед рахунком уточніть три речі: що за об’єкт, на якому етапі роботи і хто монтує — майстер чи сам клієнт. Від цього залежить, що допродати.',
+  'Коли клієнт каже «дорого», спитайте: «З чим порівнюєте?» Часто порівнюють інший клас товару або комплект без половини позицій.',
+  'Майстру важливіше не найдешевше, а те, через що не доведеться їхати на повторний виїзд. Говоріть про надійність і гарантію.',
+  'Продаючи основний товар, одразу назвіть комплект: до змішувача — підводки, до унітаза — кнопку й кріплення, до котла — групу безпеки й фільтр.',
+  'Наступний крок у CRM записуйте з датою. «Передзвонити» без дати майже ніколи не стається.',
+  'Попросіть у майстра фото об’єкта або план — це економить десяток уточнень і показує, що ви думаєте за нього.',
+  'Після ціни витримайте паузу. Не поспішайте зі знижкою — дайте клієнту подумати й поставити питання.',
+  'Нема товару — одразу пропонуйте аналог і строк приходу. «Нема» без варіантів — це втрачений продаж.',
+  'Говоріть мовою вигоди: не «латунний корпус», а «прослужить роки й не потече».',
+  'Відкриті питання продають краще: «Що для вас найважливіше в цій ванній?» замість «Вам щось ще?»',
+  'Після доставки напишіть клієнту, чи все підійшло. Повторний клієнт обходиться дешевше за нового.',
+  'Якщо клієнт вагається між двома варіантами — порівняйте їх у трьох пунктах і скажіть, який взяли б самі і чому.'];
+const KB_HINTS = [
+  'Питайте своїми словами — як у звичайному чаті. Можна уточнювати й перепитувати.',
+  'Наявність і ціну товару я дивлюся на сайті hot-point.com.ua — назвіть модель або код товару.',
+  'Під кожною відповіддю є джерела — натисніть, щоб побачити, звідки інформація.'];
+const TIP_MS = 9000;   // кожну пораду показуємо 9 с — встигнути дочитати
 const isStaffNow = () => typeof isStaff === 'function' && isStaff();
 const chatKey = () => 'kbChat:' + (S.me?.name || 'anon') + ':' + (isStaffNow() ? 's' : 'c');
 const FULL_LIMIT = 60000;   // уся база влазить у запит — модель бачить усі джерела, як NotebookLM
@@ -4740,13 +4854,17 @@ ${route ? `[0] Маршрути доставки ДЦ (таблиця від ${K
 
 function openKB(q0){
   S.tab = 'kb';
-  const box = viewOpen(`<div class="vhead"><button class="ghost" data-back>←</button><b>Довідник «Гарячої Точки»</b><button class="ghost" data-close>Закрити</button></div>
-    <div class="kb kbc"><div class="kb-main">
+  const staff0 = isStaffNow();
+  const box = viewOpen(`<div class="kb kbc"><div class="kb-main">
+      <div class="kb-top"><button class="ghost ic" data-back aria-label="Назад" style="flex:none">←</button>
+        <div class="kb-logo">${kbIc('book')}</div>
+        <div class="kb-tt"><b>Довідник «Гарячої Точки»</b><span id="kbInfo"><i></i>${KB_GS ? 'База знань компанії · відповідає лише з джерел' : 'База знань компанії'}</span></div>
+        <div class="kb-tb">${staff0 ? `<a href="${KB_DOC_URL}" target="_blank" rel="noopener" title="Редагувати базу знань">${kbIc('doc')}<span class="lbl">База</span></a>` : ''}${NOTEBOOK_URL && staff0 ? `<a href="${NOTEBOOK_URL}" target="_blank" rel="noopener" title="Відкрити в NotebookLM">${kbIc('book')}<span class="lbl">NotebookLM</span></a>` : ''}<button id="kbNew" title="Новий діалог"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg><span class="lbl">Новий</span></button><button data-close title="Закрити"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div></div>
       <div class="kb-feed" id="kbFeed"></div>
-      <div class="kb-comp"><textarea id="kbQ" rows="1" placeholder="Запитайте своїми словами…"></textarea>
+      <div class="kb-dock"><div class="kb-comp"><textarea id="kbQ" rows="1" placeholder="Запитайте про компанію, доставку, документи, товар…"></textarea>
         <button class="ic ghost mic" data-mic="kbQ" aria-label="Голосом">${typeof MIC_SVG !== 'undefined' ? MIC_SVG : '🎤'}</button>
         <button class="ic btn" id="kbGo" aria-label="Надіслати"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div>
-      <div class="kb-foot"><span id="kbInfo">${KB_GS ? 'Відповідаю з Google Doc «Довідник ГТ» · Gemini, безкоштовно, temperature 0' : 'Відповідаю з довідника «Гарячої Точки» · MiniMax, temperature 0'}</span>${NOTEBOOK_URL ? `<a class="btn ghost" href="${NOTEBOOK_URL}" target="_blank" rel="noopener">Відкрити в NotebookLM</a>` : ''}${isStaffNow() ? `<a class="ghost" href="${KB_DOC_URL}" target="_blank" rel="noopener" style="font-size:12.5px;white-space:nowrap">Редагувати базу</a>` : ''}<button class="ghost" id="kbNew">Новий діалог</button></div>
+        <div class="kb-foot"><span>Відповіді — з бази знань «Гарячої Точки»${KB_GS ? ' · безкоштовно' : ''}</span><span class="kbd">Enter — надіслати · Shift+Enter — новий рядок</span></div></div>
     </div><aside class="kb-src" id="kbSrc"></aside></div>`);
   box.querySelector('[data-back]').onclick = navBack;
   const inp = $('kbQ'), feed = $('kbFeed');
@@ -4758,26 +4876,32 @@ function openKB(q0){
   $('kbGo').onclick = () => send();
   $('kbNew').onclick = () => { chat = []; save(); draw(); inp.focus(); };
   const cardById = id => KB.cards.find(c => String(c.id) === String(id));
+  let tipT = null, tipI = Math.floor(Math.random() * 1000);
+  const tipBox = (txt, pin) => `<div class="kb-tip${pin ? ' pin' : ''}"><div class="h">${kbIc('bulb')}${isStaffNow() ? (pin ? 'Порада, поки чекали' : 'Порада менеджеру') : 'Підказка'}</div><p>${esc(txt)}</p>${pin ? '' : `<div class="bar" style="animation-duration:${TIP_MS}ms"></div>`}</div>`;
+  const nextTip = () => { const L = isStaffNow() ? KB_TIPS : KB_HINTS; return L[tipI++ % L.length]; };
   function msgHtml(m, i){
     if(m.role === 'me') return `<div class="kbm me"><div class="bub">${esc(m.text)}</div></div>`;
-    if(m.typing) return `<div class="kbm ai"><div class="who">Довідник ГТ</div><div class="kb-typing"><i></i><i></i><i></i><span>Шукаю в довіднику…</span></div></div>`;
+    if(m.typing) return `<div class="kbm ai"><div class="kb-av">ГТ</div><div class="kb-body"><div class="kb-think"><span class="sp"></span><span id="kbStep">${esc(m.step || 'Шукаю в довіднику…')}</span></div><div id="kbTip">${tipBox(m.tip || '')}</div></div></div>`;
     const ids = [...new Set((String(m.text).match(/\[\d{1,2}(?:\s*,\s*\d{1,2})*\]/g) || []).flatMap(x => x.slice(1, -1).split(/\s*,\s*/)))];
     const cited = ids.map(id => id === '0' ? null : cardById(id)).filter(Boolean);
-    return `<div class="kbm ai" data-i="${i}"><div class="who">Довідник ГТ</div><div class="kb-txt">${rich(m.text)}</div>
-      ${m.route ? `<div class="kb-route">🚚 ${esc(m.route)}</div>` : ''}
-      ${cited.length ? `<details class="kb-cites"><summary>Джерела: ${cited.map(c => `<span class="kb-cite">${c.id}</span> ${esc(c.title)}`).join(' · ')}</summary>${cited.map(c => cardHtml(c, c.id)).join('')}</details>` : ''}
-      ${m.err ? '' : `<div class="kb-meta"><button class="ghost" data-fix="${cited[0]?.id || 0}" data-q="${esc(chat[i - 1]?.text || '')}">Неточно? Запропонувати правку</button></div>`}</div>`;
+    const last = i === chat.length - 1;
+    return `<div class="kbm ai${m.err ? ' err' : ''}" data-i="${i}"><div class="kb-av">ГТ</div><div class="kb-body"><div class="kb-txt">${rich(m.text)}</div>
+      ${m.route ? `<div class="kb-route">${kbIc('truck').replace('<svg', '<svg width="18" height="18" style="flex:none"')}<span>${esc(m.route)}</span></div>` : ''}
+      ${cited.length ? `<div class="kb-srcs"><span>Джерела</span>${cited.map(c => `<button class="kb-sc" data-open="${c.id}" title="${esc(c.title)}"><b>${c.id}</b><em>${esc(c.title)}</em></button>`).join('')}</div>` : ''}
+      ${m.err ? '' : `<div class="kb-act"><button data-copy="${i}">Копіювати</button><button data-fix="${cited[0]?.id || 0}" data-q="${esc(chat[i - 1]?.text || '')}">Неточно? Запропонувати правку</button></div>`}</div></div>
+      ${last && m.tip ? tipBox(m.tip, true) : ''}`;
   }
   function draw(){
     const staff = isStaffNow();
     feed.innerHTML = chat.length ? chat.map(msgHtml).join('') :
-      `<div class="kb-hello"><b>Привіт${S.me?.name ? ', ' + esc(S.me.name.split(' ')[0]) : ''}!</b><p>Я знаю все, що записано про «Гарячу Точку»: компанію, доставку й маршрути ДЦ, документи, гарантію, КУП, продажі${staff ? ', внутрішні правила' : ''}. Питайте своїми словами — як у звичайному чаті.</p>
-        <div class="kb-chips">${(staff ? CHIPS_STAFF : CHIPS_CLIENT).map(x => `<button data-ask="${esc(x)}">${esc(x)}</button>`).join('')}</div></div>`;
+      `<div class="kb-hello"><div class="hi"><div class="kb-logo">${kbIc('book')}</div><b>Привіт${S.me?.name ? ', ' + esc(S.me.name.split(' ')[0]) : ''}!</b></div>
+        <p>Я знаю все, що записано про «Гарячу Точку»: компанію, доставку й маршрути ДЦ, документи, гарантію, КУП, продажі${staff ? ', внутрішні правила' : ''}. Наявність і ціну дивлюся на сайті. Питайте своїми словами.</p>
+        <div class="kb-topics">${(staff ? TOPICS_STAFF : TOPICS_CLIENT).map(([ic, t, q]) => `<button class="kb-topic" data-ask="${esc(q)}"><span class="ti">${kbIc(ic)}</span><span><small>${esc(t)}</small><span>${esc(q)}</span></span></button>`).join('')}</div></div>`;
     feed.scrollTop = feed.scrollHeight;
   }
   function srcList(hl = []){
     const by = {}; for(const c of visible()) (by[c.sec] ||= []).push(c);
-    $('kbSrc').innerHTML = `<h5>Блокнот · ${visible().length} джерел</h5>` + Object.entries(by).map(([s, cs]) => `<details ${cs.some(c => hl.includes(String(c.id))) ? 'open' : ''}><summary>${esc(s)} <span>${cs.length}</span></summary>${cs.map(c => `<button class="kb-it${hl.includes(String(c.id)) ? ' on' : ''}" data-open="${c.id}">${esc(c.title)}${c.todo ? ' <i title="є що заповнити">❓</i>' : ''}</button>`).join('')}</details>`).join('')
+    $('kbSrc').innerHTML = `<h5>Джерела <em>${visible().length}</em></h5>` + Object.entries(by).map(([s, cs]) => `<details ${cs.some(c => hl.includes(String(c.id))) || !hl.length ? 'open' : ''}><summary>${esc(s)} <span>${cs.length}</span></summary>${cs.map(c => `<button class="kb-it${hl.includes(String(c.id)) ? ' on' : ''}" data-open="${c.id}"><span>${esc(c.title)}</span>${c.todo ? '<i title="у картці є що заповнити"></i>' : ''}</button>`).join('')}</details>`).join('')
       + (isStaffNow() && KB.zones ? `<p class="kb-note" style="margin-top:12px">+ маршрути доставки ДЦ: ${Object.keys(KB.zones).length} зон${KB.routesUpd ? ', таблиця від ' + esc(KB.routesUpd) : ''}.</p>` : '');
   }
   box.addEventListener('click', e => {
@@ -4787,14 +4911,19 @@ function openKB(q0){
       let pop = $('kbPop'); if(!pop){ pop = document.createElement('div'); pop.id = 'kbPop'; pop.className = 'kb-pop'; box.appendChild(pop); }
       pop.innerHTML = `<div class="kb-popin"><div class="row between"><b>Джерело</b><button class="ghost" data-popx>Закрити</button></div>${cardHtml(c, c.id)}<button class="btn" data-ask="${esc('Розкажи коротко: ' + c.title)}">Запитати про це</button></div>`; pop.hidden = false; return; }
     if(e.target.closest('[data-popx]') || e.target.id === 'kbPop'){ $('kbPop').hidden = true; return; }
-    const ct = e.target.closest('.kb-txt .kb-cite'); if(ct){ const d = ct.closest('.kbm')?.querySelector('.kb-cites'); if(d){ d.open = true; d.querySelector(`[data-card="${ct.dataset.cite}"]`)?.scrollIntoView({ behavior:'smooth', block:'center' }); } }
+    const cp = e.target.closest('[data-copy]'); if(cp){ const m = chat[+cp.dataset.copy]; navigator.clipboard?.writeText(String(m?.text || '').replace(/\s*\[\d{1,2}(?:\s*,\s*\d{1,2})*\]/g, '').replace(/\*\*/g, '')).then(() => { cp.textContent = 'Скопійовано ✓'; setTimeout(() => cp.textContent = 'Копіювати', 1500); }); return; }
+    const ct = e.target.closest('.kb-txt .kb-cite[data-cite]'); if(ct){ const c = cardById(ct.dataset.cite); if(c){ const fake = document.createElement('i'); fake.dataset.open = c.id; box.querySelector(`.kb-sc[data-open="${c.id}"]`)?.click(); } }
   });
   async function send(){
     const q = inp.value.trim(); if(!q || busy) return;
     if($('kbPop')) $('kbPop').hidden = true;
     busy = true; inp.value = ''; grow();
     const hist = chat.filter(m => !m.typing && !m.err);
-    chat.push({ role:'me', text:q }); const w = { role:'ai', typing:true }; chat.push(w); draw();
+    chat.push({ role:'me', text:q }); const w = { role:'ai', typing:true, tip:nextTip(), step:'Шукаю в довіднику…' }; chat.push(w); draw();
+    const steps = ['Шукаю в довіднику…', 'Читаю потрібні джерела…', 'Звіряю факти…', 'Формулюю відповідь…'];
+    if(/наявн|залишк|на складі|ціна|скільки кошт/i.test(q)) steps.splice(1, 0, 'Дивлюся на сайті hot-point.com.ua…');
+    let st = 0; const stepT = setInterval(() => { if(st < steps.length - 1){ w.step = steps[++st]; const el = $('kbStep'); if(el) el.textContent = w.step; } }, 2200);
+    clearInterval(tipT); tipT = setInterval(() => { w.tip = nextTip(); const el = $('kbTip'); if(el) el.innerHTML = tipBox(w.tip); }, TIP_MS);
     try{
       await kbLoad();
       const r = routeAnswer(q) || routeAnswer(hist.filter(m => m.role === 'me').slice(-1)[0]?.text + ' ' + q);
@@ -4816,6 +4945,7 @@ function openKB(q0){
       Object.assign(w, { typing:false, text, route:r?.zone ? r.text : '' });
       srcList([...new Set((text.match(/\[\d{1,2}(?:\s*,\s*\d{1,2})*\]/g) || []).flatMap(x => x.slice(1, -1).split(/\s*,\s*/)))]);
     }catch(e){ Object.assign(w, { typing:false, err:true, text:'Не вдалося отримати відповідь: ' + (e.message || 'помилка') + '. Спробуйте ще раз.' }); }
+    clearInterval(stepT); clearInterval(tipT); delete w.step;
     busy = false; save(); draw(); inp.focus({ preventScroll:true });
   }
   draw();
