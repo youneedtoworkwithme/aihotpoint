@@ -1045,7 +1045,7 @@ const $ = id => document.getElementById(id);
 // ТЕСТ: модель MiniMax M3.1 Flash. Ключ MiniMax → напряму api.minimax.io; ключ OpenRouter (sk-or-…) → через openrouter.ai.
 // ── Автооновлення: одне постійне посилання без ?v=. Сторінка сама перевіряє, чи на GitHub не вийшла новіша версія,
 // і тихо перезавантажується (адреса в рядку браузера лишається та сама). При кожному оновленні міняти APP_VER.
-const APP_VER = '2026-11-26.4';
+const APP_VER = '2026-11-26.5';
 const HP_SHOWROOM = { schedule:'Пн–Пт 09:00–18:00', address:'Львів, вул. Зелена, 238, корпус «В»' };
 const HP_MANAGERS = [
   { id:'vlad', name:'Владислав Гірняк', role:'Менеджер', phones:['+38 (067) 534 59 41','+38 (063) 334 36 54'], email:'HirniakVO@hot-point.com.ua', tg:'https://t.me/Manaaggerr03', viber:'+380675345941', url:'https://youneedtoworkwithme.github.io/vlad/' },
@@ -4562,8 +4562,8 @@ addEventListener('hashchange', () => { if(location.hash === '#majster') wizOpen(
 const KB = { cards:null, zones:null, ver:'', loading:null };
 // Безкоштовний режим: Apps Script «Довідник ГТ» (apps-script/dovidnyk.gs) читає Google Doc — той самий, що в NotebookLM, — і відповідає через Gemini API free tier.
 const KB_GS = '';           // URL веб-додатку …/exec після розгортання; поки порожньо — запасний варіант MiniMax
-const NOTEBOOK_URL = '';    // посилання на ноутбук «Довідник ГТ» у NotebookLM (поділитися → перегляд)
-const KB_DOC_URL = 'https://docs.google.com/document/d/1OpYT7Qji1XTvK5yB5iz5DAXw4PuUhC-15rsJCVh_FmM/edit';
+const NOTEBOOK_URL = 'https://notebook.google.com/notebook/6a1d17cd-ecaa-490c-b308-5f40dc90fc3a';    // посилання на ноутбук «Довідник ГТ» у NotebookLM (поділитися → перегляд)
+const KB_DOC_URL = 'https://docs.google.com/document/d/1VEr9AJGphtLcesIItjsDHs-f2Rc3oJ9F3kTz9iAb-as/edit';
 const KB_URL = 'kb/hotpoint-kb.md', KB_ROUTES = 'kb/dostavka.json';
 const DAY_UA = ['пн','вт','ср','чт','пт','сб','нд'], DAY_FULL = ['понеділок','вівторок','середа','четвер','пʼятниця','субота','неділя'];
 

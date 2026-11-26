@@ -12,7 +12,7 @@
  * 5. NotebookLM → Новий ноутбук «Довідник ГТ» → Джерела → Google Диск → два документи:
  *    «Довідник ГТ — база знань…» і «Маршрути доставки ДЦ — для NotebookLM». Поділитися ноутбуком з менеджерами (перегляд).
  */
-const DOC_ID   = '1OpYT7Qji1XTvK5yB5iz5DAXw4PuUhC-15rsJCVh_FmM';           // «Довідник ГТ — база знань»
+const DOC_ID   = '1VEr9AJGphtLcesIItjsDHs-f2Rc3oJ9F3kTz9iAb-as';           // «Довідник ГТ — база знань»
 const SHEET_ID = '10uX5SjNpgZu3ss61UbjLQ6Jwmuwu0M-VZ1gSHBzogI8';           // таблиця з вкладкою «Доставка»
 const FOLDER_ID = '1W4oMy3_ERUpbFWPcY5mILMZtBj9VjeSZ';                     // «РОЗРОБКА ШІ ХОТПОІНТ»
 // безкоштовні моделі Gemini API, по черзі: якщо одна вичерпала ліміт (429) або недоступна — береться наступна
@@ -48,6 +48,10 @@ function kbMarkdown_(){
   putBig_(c, k, md, 600);
   return md;
 }
+// CacheService тримає до 100 КБ на ключ — довгий текст ріжемо на шматки
+function putBig_(c, k, s, ttl){ const o = {}; let n = 0; for(let i = 0; i < s.length; i += 40000) o[k + ':' + (n++)] = s.slice(i, i + 40000); o[k + ':n'] = String(n); c.putAll(o, ttl); }
+function getBig_(c, k){ const n = +c.get(k + ':n'); if(!n) return null; const keys = []; for(let i = 0; i < n; i++) keys.push(k + ':' + i);
+  const got = c.getAll(keys); let s = ''; for(const kk of keys){ if(got[kk] == null) return null; s += got[kk]; } return s; }
 // експорт Google Docs екранує символи і додає порожні пункти списку — прибираємо
 function clean_(s){
   return s.replace(/\\([\\`*_{}\[\]()#+\-.!>~|:=])/g, '$1').replace(/\[([^\]]+)\]\((https?:[^)]+)\)/g, (m, t, u) => t === u ? u : t + ' (' + u + ')')
@@ -68,7 +72,7 @@ function ask_(b){
   const q = String(b.q || '').slice(0, 2000).trim(); if(!q) return { ok:false, error:'Порожнє питання' };
   const staff = !!b.staff, hist = (b.history || []).slice(-6);
   const cards = cards_(kbMarkdown_()).filter(c => staff || !c.staff);
-  const now = Utilities.formatDate(new Date(), 'Europe/Kyiv', 'EEEE, dd.MM.yyyy HH:mm');
+  const now = Utilities.formatDate(new Date(), 'Europe/Kiev', 'EEEE, dd.MM.yyyy HH:mm');
   const src = cards.map(c => `[${c.id}] ${c.title} (розділ: ${c.meta['розділ'] || '—'}; для: ${c.staff ? 'персоналу' : 'всіх'}; джерело: ${c.meta['джерело'] || '—'}; оновлено: ${c.meta['оновлено'] || '—'})\n${c.text}`).join('\n\n---\n\n');
   const sys = `Ти — «Довідник ГТ», розумний помічник ${staff ? 'менеджерів і директора' : 'клієнтів'} магазину «Гаряча Точка» (Львів, вул. Зелена, 238; мережа холдингу DUS Level). Працюєш як NotebookLM: твій «блокнот» — ДЖЕРЕЛА нижче. Зараз ${now} (Київ).
 ЯК ВІДПОВІДАТИ:
@@ -123,7 +127,7 @@ function syncRoutes(){
   if(!id){ doc = DocumentApp.create('Маршрути доставки ДЦ — для NotebookLM'); DriveApp.getFileById(doc.getId()).moveTo(DriveApp.getFolderById(FOLDER_ID)); P.setProperty('ROUTES_DOC_ID', doc.getId()); }
   const body = doc.getBody(); body.clear();
   body.appendParagraph('Маршрути доставки ДЦ Київ: у які дні машина їде в зону').setHeading(DocumentApp.ParagraphHeading.HEADING1);
-  body.appendParagraph('Оновлено автоматично ' + Utilities.formatDate(new Date(), 'Europe/Kyiv', 'dd.MM.yyyy HH:mm') + ' з таблиці «Hotpoint — назви, клієнти, правила, доставка», вкладка «Доставка». «Львів» без уточнення = машина на магазин ГТ Львів. Годину відсічки таблиця не знає. Назви зон — як у 1С (часто російською).');
+  body.appendParagraph('Оновлено автоматично ' + Utilities.formatDate(new Date(), 'Europe/Kiev', 'dd.MM.yyyy HH:mm') + ' з таблиці «Hotpoint — назви, клієнти, правила, доставка», вкладка «Доставка». «Львів» без уточнення = машина на магазин ГТ Львів. Годину відсічки таблиця не знає. Назви зон — як у 1С (часто російською).');
   for(const z of Object.keys(by).sort()){
     const days = Object.keys(by[z]).sort((a, b) => order.indexOf(a) - order.indexOf(b)).map(d => d.toLowerCase() + ' (' + [...by[z][d]].join(', ') + ')');
     body.appendParagraph(z + ': ' + days.join('; '));
