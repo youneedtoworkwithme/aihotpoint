@@ -109,17 +109,19 @@ function ask_(b){
 ${b.route ? `[0] Маршрути доставки ДЦ (пораховано на сайті): ${String(b.route).slice(0, 1500)}\n\n---\n\n` : ''}${src}`;
   const contents = hist.map(m => ({ role:m.role === 'me' ? 'user' : 'model', parts:[{ text:String(m.text || '').slice(0, 1500) }] }));
   contents.push({ role:'user', parts:[{ text:q }] });
-  // Наявність/залишки: поки дивимось на сайті hot-point.com.ua через безкоштовний пошук Google (grounding)
-  const stockQ = /наявн|залишк|на складі|в наличии|остат|скільки є|чи є\s/i.test(q);
-  const sysFull = sys + (stockQ ? `\n\nНАЯВНІСТЬ: питання про наявність/залишки. Пошукай товар на сайті hot-point.com.ua (site:hot-point.com.ua) і скажи, що показує сайт (є / немає / під замовлення, ціна з сайту) з посиланням. Додай: «Точну наявність на складі ГТ 31 підтверджує менеджер». Якщо нічого не знайшов — так і скажи.` : '');
+  // Наявність/залишки: безкоштовно дивимось пошук на сайті hot-point.com.ua і даємо знайдене моделі як джерело [С1], [С2]…
+  const stockQ = /наявн|залишк|на складі|в наличии|остат|скільки є|чи є\s|є\s+в\s+наявн|ціна|скільки кошт/i.test(q);
+  const site = stockQ ? siteStock_(q) : null;
+  const sysFull = sys + (stockQ ? `\n\nНАЯВНІСТЬ / ЦІНА З САЙТУ hot-point.com.ua (пошук «${site && site.kw || '—'}»):\n` +
+    (site && site.items.length ? site.items.map((x, i) => `[С${i + 1}] ${x.name} — код ${x.code || '—'}; ціна на сайті: ${x.price || '—'}; статус: ${x.stock || '—'}; ${x.url}`).join('\n') : 'нічого не знайдено') +
+    `\nВідповідай про наявність тільки за цими рядками, з номером [С1]… і посиланням. «На складі» на сайті — це наявність у мережі, не обов'язково в ГТ 31: додай «Точну наявність у ГТ 31 підтверджує менеджер». Якщо відповідного товару нема в списку — так і скажи і порадь уточнити назву або код.` : '');
   const models = (P.getProperty('GEMINI_MODELS') || MODELS.join(',')).split(',').map(s => s.trim()).filter(Boolean);
   let last = '';
-  const call = (model, tools) => UrlFetchApp.fetch('https://generativelanguage.googleapis.com/v1beta/models/' + model + ':generateContent', {
+  const call = model => UrlFetchApp.fetch('https://generativelanguage.googleapis.com/v1beta/models/' + model + ':generateContent', {
       method:'post', contentType:'application/json', muteHttpExceptions:true, headers:{ 'x-goog-api-key':key },
-      payload:JSON.stringify(Object.assign({ systemInstruction:{ parts:[{ text:sysFull }] }, contents, generationConfig:{ temperature:0, maxOutputTokens:4000 } }, tools ? { tools:[{ google_search:{} }] } : {})) });
+      payload:JSON.stringify({ systemInstruction:{ parts:[{ text:sysFull }] }, contents, generationConfig:{ temperature:0, maxOutputTokens:4000 } }) });
   for(const model of models){
-    let r = call(model, stockQ);
-    if(stockQ && r.getResponseCode() === 400) r = call(model, false);   // модель без пошуку — відповідаємо з довідника
+    const r = call(model);
     const code = r.getResponseCode(), j = JSON.parse(r.getContentText() || '{}');
     if(code === 200){
       const text = ((j.candidates || [])[0]?.content?.parts || []).filter(p => !p.thought).map(p => p.text || '').join('').trim() || 'У довіднику цього ще нема.';
@@ -131,6 +133,33 @@ ${b.route ? `[0] Маршрути доставки ДЦ (пораховано н
   }
   return { ok:false, error:'Gemini не відповів (' + last + ')' };
 }
+
+// ── Пошук товару на сайті hot-point.com.ua (безкоштовно, без ключів) ──
+function siteStock_(q){
+  // \b у JS не працює з кирилицею — фільтруємо слова
+  const stop = /^(чи|є|в|у|на|наявності|наявність|наявн\S*|залишк\S*|складі|складах|скільки|коштує|кошт\S*|ціна|ціну|а|і|й|та|будь|ласка|підкажіть|підкажи|скажи|скажіть|шт|штук|зараз|сьогодні|маємо|має|є-ли|есть|ли)$/i;
+  const kw = String(q).replace(/[?!.,«»"]/g, ' ').split(/\s+/).filter(w => w && !stop.test(w)).join(' ').slice(0, 80);
+  if(!kw) return { kw:'', items:[] };
+  const c = CacheService.getScriptCache(), ck = 'site:' + Utilities.base64EncodeWebSafe(Utilities.computeDigest(Utilities.DigestAlgorithm.MD5, kw.toLowerCase())).slice(0, 22);
+  const hit = c.get(ck); if(hit) return JSON.parse(hit);
+  const words = kw.split(' ');
+  let items = [], used = kw;
+  for(let n = words.length; n >= Math.min(2, words.length) && !items.length; n--){      // нема результатів — коротшаємо запит
+    used = words.slice(0, n).join(' ');
+    try{
+      const html = UrlFetchApp.fetch('https://hot-point.com.ua/index.php?route=product/search&limit=6&search=' + encodeURIComponent(used), { muteHttpExceptions:true, followRedirects:true }).getContentText();
+      items = html.split(/class="product-thumb/).slice(1, 7).map(part => {
+        const txt = re => { const m = part.match(re); return m ? m[1].replace(/<[^>]+>/g, ' ').replace(/&nbsp;|&#160;/g, ' ').replace(/&quot;/g, '"').replace(/&amp;/g, '&').replace(/&#039;|&#39;/g, "'").replace(/\s+/g, ' ').trim() : ''; };
+        const cap = (part.match(/class="caption[\s\S]*?<a[^>]*href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/) || []);
+        return { name:(cap[2] || '').replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim(), url:cap[1] || '', price:txt(/class="price[^"]*"[^>]*>([\s\S]*?)<\/div>/), stock:txt(/class="cat__p_stock[^"]*"[^>]*>([\s\S]*?)<\/div>/), code:(txt(/class="cat__p_code[^"]*"[^>]*>([\s\S]*?)<\/div>/).match(/\d+/) || [''])[0] };
+      }).filter(x => x.name);
+    }catch(e){ items = []; }
+  }
+  const res = { kw:used, items };
+  c.put(ck, JSON.stringify(res), 900);   // 15 хв
+  return res;
+}
+function testStock(){ Logger.log(JSON.stringify(siteStock_('Чи є в наявності котел Vaillant ecoTEC plus 25?'), null, 1)); }
 
 // ── Журнал питань: що питають менеджери — підказка, що дописати в довідник ──
 function log_(b, q, model, text){
