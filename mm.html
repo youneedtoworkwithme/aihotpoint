@@ -1045,7 +1045,7 @@ const $ = id => document.getElementById(id);
 // ТЕСТ: модель MiniMax M3.1 Flash. Ключ MiniMax → напряму api.minimax.io; ключ OpenRouter (sk-or-…) → через openrouter.ai.
 // ── Автооновлення: одне постійне посилання без ?v=. Сторінка сама перевіряє, чи на GitHub не вийшла новіша версія,
 // і тихо перезавантажується (адреса в рядку браузера лишається та сама). При кожному оновленні міняти APP_VER.
-const APP_VER = '2026-11-15.6';
+const APP_VER = '2026-11-26.1';
 const HP_SHOWROOM = { schedule:'Пн–Пт 09:00–18:00', address:'Львів, вул. Зелена, 238, корпус «В»' };
 const HP_MANAGERS = [
   { id:'vlad', name:'Владислав Гірняк', role:'Менеджер', phones:['+38 (067) 534 59 41','+38 (063) 334 36 54'], email:'HirniakVO@hot-point.com.ua', tg:'https://t.me/Manaaggerr03', viber:'+380675345941', url:'https://youneedtoworkwithme.github.io/vlad/' },
@@ -1526,7 +1526,7 @@ async function claude(messages, extra = {}){
   }
   const viaProxy = provider() === 'proxy';
   // reasoning_effort 'low': M3.1 Flash за замовчуванням думає на 'max' і з'їдає весь ліміт токенів
-  const body = { model: viaProxy ? MM.minimax.model : MM.openrouter.model, max_tokens:Math.max(ex.max_tokens||16000, 16000), reasoning_effort:effort, temperature: ex.temperature ?? 0.1, messages:oai };
+  const body = { model: viaProxy ? MM.minimax.model : MM.openrouter.model, max_tokens:Math.max(ex.max_tokens||16000, 16000), reasoning_effort:effort, temperature: ex.temperature ?? 0, messages:oai };
   if(tools.length) body.tools = tools.map(t=>({type:'function', function:{name:t.name, description:t.description, parameters:t.input_schema}}));
   let d;
   if(viaProxy){
@@ -3636,16 +3636,16 @@ const isDir = () => S.me?.role === 'директор' && !S.viewAs;
 // головні вкладки (шапка на комп’ютері, «пігулка» на телефоні)
 function shTabs(){
   if(isClient()) return [['chat','Запит'], ['objects','Мої об’єкти'], ['search','Пошук'], ['manager','Менеджер']];
-  return [['chat','Підбір'], ['clients','Клієнти'], ['search','Пошук'], ...(isDir() ? [['report','Звіт']] : [])];
+  return [['chat','Підбір'], ['clients','Клієнти'], ['search','Пошук'], ['kb','Довідник'], ...(isDir() ? [['report','Звіт']] : [])];
 }
 // повне меню (бокова панель)
 function shMenu(){
   if(isClient()) return [
     ['Робота', [['chat','Новий запит'], ['objects','Мої об’єкти'], ['search','Пошук товарів'], ['chats','Мої чати']]],
-    ['Я і «Гаряча Точка»', [['profile','Мій профіль'], ['manager','Мій менеджер'], ['news','Новинки і викладки']]],
+    ['Я і «Гаряча Точка»', [['profile','Мій профіль'], ['manager','Мій менеджер'], ['kb','Довідник: доставка, гарантія, контакти'], ['news','Новинки і викладки']]],
     ['Допомога', [['help','Що вміє ШІ і як краще'], ['idea','Повідомити про помилку / ідею']]]];
   return [
-    ['Робота', [['chat','Новий підбір'], ['clients','Клієнти'], ['search','Пошук'], ['chats','Мої чати']]],
+    ['Робота', [['chat','Новий підбір'], ['clients','Клієнти'], ['search','Пошук'], ['kb','Довідник ГТ (база знань)'], ['chats','Мої чати']]],
     ['Керування', [['profile','Мій профіль'], ...(isDir() ? [['report','Звіт'], ['ideas','Пропозиції й помилки ШІ']] : []), ['eye','Подивитись як клієнт']]],
     ['Допомога', [['news','Новинки і викладки'], ['help','Що вміє ШІ і як краще'], ['idea','Повідомити про помилку / ідею']]]];
 }
@@ -3734,7 +3734,7 @@ function drawerOpen(side){
   dr.hidden = false; requestAnimationFrame(() => dr.classList.add('open'));
   box.onclick = e => { const b = e.target.closest('[data-dm]'); if(!b) return; const k = b.dataset.dm; drawerClose(); if(k === 'x') return;
     startWork(); NAV.length = 0;
-    if(['chat','clients','objects','search','report','manager','profile'].includes(k)) return tabGo(k);
+    if(['chat','clients','objects','search','report','manager','profile','kb'].includes(k)) return tabGo(k);
     S.tab = 'more';
     if(k === 'chats'){ closeView(); openSide(); } else if(k === 'news') openNews(); else if(k === 'help') openHelp(); else if(k === 'idea') ideaForm('меню');
     else if(k === 'ideas') openIdeas(); else if(k === 'eye'){ openClients(); showErr('Оберіть клієнта і натисніть «👁 Подивитись як клієнт».'); setTimeout(hideErr, 4000); }
@@ -4492,6 +4492,272 @@ $('introStart')?.insertAdjacentHTML('afterend', '<button class="i-wiz" data-wiz>
 // пряме посилання: mm.html#majster (можна давати клієнтам)
 if(location.hash === '#majster') setTimeout(wizOpen, 300);
 addEventListener('hashchange', () => { if(location.hash === '#majster') wizOpen(); });
+})();
+</script>
+
+<!-- ══ Довідник ГТ: база знань «Гарячої Точки» (як NotebookLM: відповідь лише з джерел) ══
+     Пошук і маршрути доставки рахуються в браузері — безкоштовно. ШІ (MiniMax, temperature 0) — лише на кнопку,
+     отримує тільки 5 знайдених карток, відповідь кешується. Джерела: kb/hotpoint-kb.md і kb/dostavka.json. -->
+<style>
+.kb{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:22px;align-items:start;padding-bottom:30px}
+@media (max-width:900px){.kb{grid-template-columns:minmax(0,1fr)}.kb-src{order:2}}
+.kb-ask{display:flex;gap:6px;margin:6px 0 10px}
+.kb-ask input{flex:1;min-width:0;font:inherit;font-size:16px;padding:11px 14px;border:1.5px solid var(--line);border-radius:14px;background:var(--surface);color:var(--fg)}
+.kb-ask input:focus{outline:none;border-color:var(--brand)}
+.kb-chips{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 14px}
+.kb-chips button{font:inherit;font-size:13px;padding:6px 11px;border:1px solid var(--line);border-radius:999px!important;background:var(--surface);color:var(--fg);cursor:pointer}
+.kb-chips button:hover{border-color:var(--brand);color:var(--brand-ink)}
+@media (max-width:640px){.kb-chips{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:4px;scrollbar-width:none}.kb-chips button{flex:none}}
+.kb-note{font-size:12.5px;color:var(--muted);margin:0 0 12px}
+.kb-ans{border:1px solid var(--line);border-radius:16px;background:var(--surface);padding:14px 16px;margin-bottom:12px}
+.kb-ans h4{margin:0 0 6px;font-size:15px;display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+.kb-ans h4 small{font-weight:600;color:var(--muted);font-size:12px}
+.kb-ans.ai{border-color:var(--brand);background:var(--tint)}
+.kb-ans.route{border-left:4px solid var(--brand)}
+.kb-txt{font-size:14.5px;line-height:1.55;overflow-wrap:anywhere}
+.kb-txt ul,.kb-txt ol{margin:4px 0 4px 20px;padding:0}.kb-txt li{margin:2px 0}.kb-txt p{margin:4px 0}
+.kb-txt a{color:var(--brand-ink)}
+.kb-txt .todo{background:var(--warn-bg,#FFF4E0);color:var(--warn,#8A5A00);border-radius:6px;padding:0 4px}
+.kb-cite{display:inline-block;min-width:18px;text-align:center;font-size:11px;font-weight:800;line-height:18px;border-radius:9px!important;background:var(--brand);color:var(--on-brand);padding:0 4px;margin:0 1px;cursor:pointer;border:0;vertical-align:1px}
+.kb-meta{margin-top:8px;font-size:12px;color:var(--muted);display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.kb-meta button{font:inherit;font-size:12px;padding:3px 9px;border-radius:8px!important}
+.kb-acts{display:flex;gap:8px;flex-wrap:wrap;margin:4px 0 14px}
+.kb-src h5{margin:4px 0 8px;font-size:13px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
+.kb-src details{border-bottom:1px solid var(--line);padding:4px 0}
+.kb-src summary{cursor:pointer;font-weight:700;font-size:13.5px;padding:5px 0}
+.kb-src summary span{color:var(--muted);font-weight:600}
+.kb-src .kb-it{all:unset;box-sizing:border-box;display:block;width:100%;cursor:pointer;font-size:13.5px;padding:5px 8px;border-radius:8px}
+.kb-src .kb-it:hover,.kb-src .kb-it.on{background:var(--tint);color:var(--brand-ink)}
+.kb-src .kb-it i{font-style:normal;color:var(--warn,#8A5A00)}
+.kb-opts{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.kb-flash{animation:kbFlash 1.2s ease}
+@keyframes kbFlash{0%{box-shadow:0 0 0 3px var(--brand)}100%{box-shadow:0 0 0 0 transparent}}
+</style>
+<script>
+(() => {
+const KB = { cards:null, zones:null, ver:'', loading:null };
+const KB_URL = 'kb/hotpoint-kb.md', KB_ROUTES = 'kb/dostavka.json';
+const DAY_UA = ['пн','вт','ср','чт','пт','сб','нд'], DAY_FULL = ['понеділок','вівторок','середа','четвер','пʼятниця','субота','неділя'];
+
+// ── Нормалізація: однаково для укр. і рос. написання (видаткова ≈ видаткову, гарантия ≈ гарантія) ──
+const TR = {'и':'i','і':'i','ы':'i','ї':'i','й':'i','е':'e','є':'e','э':'e','ё':'e','а':'a','о':'o','у':'u','ю':'iu','я':'ia','г':'h','ґ':'g','х':'h','б':'b','в':'v','д':'d','ж':'zh','з':'z','к':'k','л':'l','м':'m','н':'n','п':'p','р':'r','с':'s','т':'t','ф':'f','ц':'c','ч':'ch','ш':'sh','щ':'sh','ъ':'','ь':''};
+const tr = s => String(s).toLowerCase().replace(/[ʼ'’`*]/g, '').replace(/[а-яіїєґёъыэ]/g, c => TR[c] ?? c);
+const skel = s => tr(s).replace(/[^a-z0-9 ]/g, ' ').replace(/o/g, 'a').replace(/e/g, 'i').replace(/(.)\1+/g, '$1').replace(/(ai|ia|ii|iai)(?=\s|$)/g, 'a').replace(/\s+/g, ' ').trim();
+const STOP = new Set('як що де до на в у і й та чи а з за по про від для це мені нам нас вам треба потрібно можна якщо коли який яка яке які кого кому хто чого чому або ще вже тут там його її їх мій моя наш наша ви ми я він вона буде було бути есть є как что где для это мне если когда какой какая кто или уже'.split(' '));
+const SYN = [['видатк','накладн'],['накладн','видатк'],['расходн','видатк накладн'],['рту','видатк накладн'],['возврат','поверн'],['поверн','возврат'],
+  ['брак','гаранті сервіс'],['поломк','гаранті брак'],['ремонт','сервіс гаранті'],['не працює','гаранті брак'],['безнал','безготівк'],['ндс','пдв'],['пдв','безготівк'],
+  ['счет','рахунок'],['отсрочк','відтермін'],['відстроч','відтермін'],['наличи','наявн'],['остат','залишк'],['залишк','наявн'],['график','графік'],
+  ['працюєте','графік'],['татр','tatra'],['термоджет','termojet'],['грундфос','grundfos'],['віло','wilo'],['вило','wilo'],['водолей','vodoley'],['адрес','адреса'],
+  ['телефон','контакти'],['кешбек','бонуси'],['відео','навчання'],['обучени','навчання']];
+function toks(s){
+  let low = ' ' + String(s || '').toLowerCase().replace(/[ʼ'’`]/g, '') + ' ';
+  for(const [a, b] of SYN) if(low.includes(a)) low += ' ' + b;
+  return low.split(/[^\p{L}\p{N}]+/u).filter(w => w && !STOP.has(w)).map(w => { const k = skel(w).replace(/ /g, ''); return k.length > 5 ? k.slice(0, 5) : k; }).filter(k => k.length >= 2);
+}
+
+// ── Розбір kb/hotpoint-kb.md: «## Назва», службові рядки «- для:», далі текст ──
+function parseKB(md){
+  md = md.replace(/<!--[\s\S]*?-->/g, '');
+  const out = [];
+  for(const part of md.split(/^##\s+/m).slice(1)){
+    const lines = part.split('\n'), title = lines.shift().trim(), meta = {};
+    while(lines.length && /^\s*-\s*(для|розділ|питання|джерело|оновлено)\s*:/i.test(lines[0])){
+      const m = lines.shift().replace(/^\s*-\s*/, '').match(/^([^:]+):\s*(.*)$/); if(m) meta[m[1].trim().toLowerCase()] = m[2].trim(); }
+    const text = lines.join('\n').trim();
+    out.push({ id:out.length + 1, title, text, aud:/персонал|staff/i.test(meta['для'] || '') ? 'staff' : 'all', sec:meta['розділ'] || 'Інше',
+      qs:meta['питання'] || '', src:meta['джерело'] || '', upd:meta['оновлено'] || '', todo:/❓/.test(text) });
+  }
+  return out;
+}
+function index(cards){
+  const df = new Map();
+  for(const c of cards){
+    const tf = new Map(), add = (s, w) => { for(const t of toks(s)) tf.set(t, (tf.get(t) || 0) + w); };
+    add(c.title, 3); add(c.qs, 3); add(c.sec, 1); add(c.text, 1);
+    c.tf = tf; c.len = [...tf.values()].reduce((a, b) => a + b, 0);
+    for(const t of tf.keys()) df.set(t, (df.get(t) || 0) + 1);
+  }
+  KB.df = df; KB.avg = cards.reduce((a, c) => a + c.len, 0) / (cards.length || 1);
+}
+async function kbLoad(){
+  if(KB.cards) return KB;
+  return KB.loading ||= (async () => {
+    const v = typeof APP_VER !== 'undefined' ? APP_VER : Date.now();
+    const [md, rt] = await Promise.all([fetch(KB_URL + '?v=' + v, {cache:'no-cache'}).then(r => r.ok ? r.text() : Promise.reject(new Error('Довідник не завантажився'))),
+      fetch(KB_ROUTES + '?v=' + v, {cache:'no-cache'}).then(r => r.ok ? r.json() : null).catch(() => null)]);
+    KB.cards = parseKB(md); KB.ver = String(md.length) + ':' + v; index(KB.cards);
+    if(rt){ KB.zones = rt.zones; KB.routesUpd = rt.updated; KB.zskel = Object.keys(rt.zones).map(z => [z, skel(z)]); }
+    return KB;
+  })().catch(e => { KB.loading = null; throw e; });
+}
+const visible = () => KB.cards.filter(c => c.aud === 'all' || (typeof isStaff === 'function' && isStaff()));
+function search(q, n = 6){
+  const qt = [...new Set(toks(q))], N = KB.cards.length, k1 = 1.4, b = .6;
+  return visible().map(c => {
+    let s = 0;
+    for(const t of qt){ const tf = c.tf.get(t); if(!tf) continue; const df = KB.df.get(t) || 0;
+      s += Math.log(1 + (N - df + .5) / (df + .5)) * (tf * (k1 + 1)) / (tf + k1 * (1 - b + b * c.len / KB.avg)); }
+    return { c, s };
+  }).filter(x => x.s > 0.8).sort((a, b) => b.s - a.s).filter((x, i, a) => x.s >= a[0].s * .3).slice(0, n);
+}
+
+// ── Маршрути доставки ДЦ: «коли доставка в Самбір» → найближчі дати (без ШІ) ──
+const RENAMES = {'кропивницький':'кировоград','дніпро':'днепропетровск','кам\'янське':'днепродзержинск','шептицький':'червоноград','подільськ':'котовск','звягель':'новоград-волынский',
+  'чорноморськ':'ильичевск','володимир':'владимир-волынский','переяслав':'переяслав-хмельницкий','миколаїв':'николаев','біла церква':'белая церковь','ніжин':'нежин',
+  'кривий ріг':'кривой рог','жовті води':'желтые воды','запоріжжя':'запорожье','одеса':'одесса','харків':'харьков','київ':'киев','рівне':'ровно','луцьк':'луцк',
+  'чернігів':'чернигов','черкаси':'черкассы','суми':'сумы','івано-франківськ':'ивано-франковск','кам\'янець-подільський':'каменец-подольский','самбір':'самбор','стрий':'стрый',
+  'дрогобич':'дрогобыч','жовква':'жолква','яворів':'яворов','радехів':'радехов','золочів':'золочев','перемишляни':'перемышляны','скнилів':'скнилов','брюховичі':'брюховичи','трускавець':'трускавец'};
+const DELIV = /(достав|машин|вивез|вивіз|привез|маршрут|відвантаж|везет|везут|їде\b|поїде|вивоз)/i;
+const PLACE_STOP = /^(коли|доставка|доставку|доставки|доставкою|доставці|доставлять|доставим|машина|машину|машини|буде|будуть|можна|вивезти|вивеземо|вивіз|вивоз|привезти|привезете|привеземо|привезуть|відвантажити|маршрут|маршрути|маршрутом|день|дні|днів|який|яка|яке|які|в|у|на|до|по|із|з|зі|клієнту|клієнт|клієнта|товар|їде|поїде|йде|піде|везе|везуть|когда|доставку|какой|будет|можно|сьогодні|завтра|найближча|найближчий|наступна|область|обл|район|село|місто|смт|м|с)$/i;
+function placeOf(q){
+  const w = String(q).toLowerCase().replace(/[?!.,;:()«»"]/g, ' ').split(/\s+/).filter(Boolean);
+  return w.filter(x => !PLACE_STOP.test(x)).join(' ').trim();
+}
+function dice(a, b){ if(a === b) return 1; if(a.length < 2 || b.length < 2) return 0;
+  const g = s => { const m = new Map(); for(let i = 0; i < s.length - 1; i++){ const x = s.slice(i, i + 2); m.set(x, (m.get(x) || 0) + 1); } return m; };
+  const A = g(a), B = g(b); let n = 0; for(const [x, c] of A) n += Math.min(c, B.get(x) || 0); return 2 * n / (a.length + b.length - 2); }
+const ZOBL = /\(.*?\)|львовской обл\S*|львовская обл\S*|львівськ\S* обл\S*|(^|\s)обл\S*|р-[кн]\.?|рынок|ринок|пгт\.?/g;
+const ztag = z => (z.toLowerCase().match(/\(.*?\)|львовской обл|львовская обл/g) || []).join(' ');
+function findZone(place){
+  if(!KB.zones || !place) return [];
+  let p = place.toLowerCase().replace(/[ʼ’]/g, '\'');
+  const wantGT = /(^|\s)(гт|гаряч\S*|горяч\S*|магазин\S*)(\s|$)/.test(p), lviv = /львівськ|львовск|львівщин/.test(p);
+  p = p.replace(/(^|\s)(гт|гаряч\S*|горяч\S*|точк\S*|магазин\S*)(?=\s|$)/g, ' ').replace(/\S+(ська|ській|ської|цька|цькій|цької|ская|ской|щина|щині)(?=\s|$)/g, ' ').replace(ZOBL, ' ').replace(/\s+/g, ' ').trim();
+  for(const [nw, old] of Object.entries(RENAMES)) if(p === nw || p.startsWith(nw + ' ')){ p = old + p.slice(nw.length); break; }
+  if(/^(львів|львов|львові|львове|лвів)$/.test(p)) return [['ГТ Львів', 1]];
+  const sq = skel(p); if(!sq) return [];
+  const out = [];
+  for(const z of Object.keys(KB.zones)){
+    const sz = skel(z.toLowerCase().replace(ZOBL, ' ')); if(!sz) continue;
+    let sc = sq === sz ? 1 : (sz.startsWith(sq + ' ') || sq.startsWith(sz + ' ')) ? .95 : Math.max(dice(sq, sz), Math.max(0, ...sz.split(' ').map(w => dice(sq, w) * .97)));
+    if(z.startsWith('ГТ ') && !wantGT) sc -= .15; if(wantGT && !z.startsWith('ГТ ')) sc -= .1;
+    if(lviv) sc += /львов|львів/i.test(z + ' ' + KB.zones[z].map(r => r[1]).join(' ')) ? .05 : -.15;
+    out.push([z, Math.round(Math.min(sc, 1) * 100) / 100]);
+  }
+  return out.sort((a, b) => b[1] - a[1]).slice(0, 6);
+}
+function kyivToday(){ const s = new Date().toLocaleDateString('en-CA', { timeZone:'Europe/Kyiv' }); const [y, m, d] = s.split('-').map(Number); return new Date(Date.UTC(y, m - 1, d, 12)); }
+function when(zone){
+  const t = kyivToday(), wd0 = (t.getUTCDay() + 6) % 7, res = [];
+  for(const [wd, route] of KB.zones[zone] || []){
+    const ahead = (wd - wd0 + 7) % 7, dd = new Date(t.getTime() + ahead * 864e5);
+    res.push({ d:dd, wd, route, today:ahead === 0 });
+    if(ahead === 0) res.push({ d:new Date(t.getTime() + 7 * 864e5), wd, route, today:false });
+  }
+  return res.sort((a, b) => a.d - b.d).slice(0, 6);
+}
+const dm = d => String(d.getUTCDate()).padStart(2, '0') + '.' + String(d.getUTCMonth() + 1).padStart(2, '0');
+function routeAnswer(q){
+  if(!(typeof isStaff === 'function' && isStaff()) || !DELIV.test(q) || !KB.zones) return null;
+  const place = placeOf(q); if(!place) return null;
+  const c = findZone(place); if(!c.length || c[0][1] < .8) return { miss:place, like:c.slice(0, 3).map(x => x[0]) };
+  const best = c[0][1], top = c.filter(x => x[1] >= best - .03).map(x => x[0]);
+  if(best < 1 && top.length > 1) return { ask:top.slice(0, 5) };
+  const same = c.filter(x => x[1] === best).map(x => x[0]);
+  if(same.length > 1 && new Set(same.map(ztag)).size > 1) return { ask:same.slice(0, 5) };
+  const zone = c[0][0], w = when(zone);
+  return { zone, rows:w, text:`${zone}: ` + w.map(x => `${DAY_UA[x.wd]} ${dm(x.d)} (маршрут «${x.route}»)${x.today ? ' — сьогодні, якщо ще встигає на машину' : ''}`).join('; ') };
+}
+
+// ── Показ ──
+function rich(s){
+  const inl = t => esc(t).replace(/(https?:\/\/[^\s<]+[^\s<.,;:)!?»])/g, '<a href="$1" target="_blank" rel="noopener">$1</a>').replace(/\*\*(.+?)\*\*/g, '<b>$1</b>')
+    .replace(/`([^`]+)`/g, '<code>$1</code>').replace(/❓([^.\n]*)/g, '<span class="todo">❓$1</span>').replace(/\[(\d{1,2})\]/g, '<button class="kb-cite" data-cite="$1">$1</button>');
+  const out = []; let list = null;
+  for(const ln of String(s).split('\n')){
+    const ul = ln.match(/^\s*[-•*]\s+(.*)/), ol = ln.match(/^\s*\d+[.)]\s+(.*)/);
+    if(ul || ol){ const t = ul ? 'ul' : 'ol'; if(list !== t){ if(list) out.push(`</${list}>`); out.push(`<${t}>`); list = t; } out.push(`<li>${inl((ul || ol)[1])}</li>`); continue; }
+    if(list){ out.push(`</${list}>`); list = null; }
+    if(ln.trim()) out.push(`<p>${inl(ln)}</p>`);
+  }
+  if(list) out.push(`</${list}>`);
+  return out.join('');
+}
+const cardHtml = (c, n) => `<div class="kb-ans" id="kbc${c.id}" data-card="${c.id}"><h4>${n ? `<span class="kb-cite">${n}</span>` : ''}${esc(c.title)}<small>${esc(c.sec)}${c.aud === 'staff' ? ' · для персоналу' : ''}</small></h4>
+  <div class="kb-txt">${rich(c.text)}</div><div class="kb-meta"><span>Джерело: ${esc(c.src || '—')}</span>${c.upd ? `<span>оновлено ${esc(c.upd)}</span>` : ''}<button class="ghost" data-fix="${c.id}">Запропонувати правку</button></div></div>`;
+const CHIPS_STAFF = ['До кого звернутись по видаткову?', 'Коли доставка в Самбір?', 'Коли машина з ДЦ на Львів?', 'Брак насоса Tatra — що робити?', 'Безготівка і відтермінування', 'Як знайти документ у КУП?', 'Що є в наявності на завтра?'];
+const CHIPS_CLIENT = ['Коли доставка?', 'Безкоштовна доставка від якої суми?', 'Адреса і графік магазину', 'Контакти менеджерів', 'Рівні клієнта і бонус за квіз'];
+
+function openKB(q0){
+  S.tab = 'kb';
+  const staff = typeof isStaff === 'function' && isStaff();
+  const box = viewOpen(`<div class="vhead"><button class="ghost" data-back>←</button><b>Довідник «Гарячої Точки»</b><button class="ghost" data-close>Закрити</button></div>
+    <div class="kb"><div class="kb-main">
+      <div class="kb-ask"><input type="search" id="kbQ" placeholder="${staff ? 'Напр.: до кого звернутись по видаткову? коли доставка в Стрий?' : 'Напр.: коли доставка? до котрої працюєте?'}" autocomplete="off" value="${esc(q0 || '')}">
+        <button class="ic ghost mic" data-mic="kbQ" aria-label="Голосом">${typeof MIC_SVG !== 'undefined' ? MIC_SVG : '🎤'}</button><button class="btn" id="kbGo">Знайти</button></div>
+      <div class="kb-chips">${(staff ? CHIPS_STAFF : CHIPS_CLIENT).map(x => `<button data-q="${esc(x)}">${esc(x)}</button>`).join('')}</div>
+      <p class="kb-note">Відповідаю лише з довідника — нічого не вигадую. Пошук безкоштовний і миттєвий; «Відповідь ШІ» складає коротку відповідь з номерами джерел.</p>
+      <div id="kbOut"><div class="small">Завантажую довідник…</div></div>
+    </div><aside class="kb-src" id="kbSrc"></aside></div>`);
+  box.querySelector('[data-back]').onclick = navBack;
+  const inp = $('kbQ'), out = $('kbOut');
+  const fix = id => { const c = KB.cards.find(x => String(x.id) === String(id)); ideaForm('довідник' + (c ? ': ' + c.title : '')); };
+  box.addEventListener('click', e => {
+    const q = e.target.closest('[data-q]'); if(q){ inp.value = q.dataset.q; run(); return; }
+    const f = e.target.closest('[data-fix]'); if(f){ fix(f.dataset.fix); return; }
+    const z = e.target.closest('[data-zone]'); if(z){ inp.value = 'Коли доставка в ' + z.dataset.zone; run(); return; }
+    const it = e.target.closest('[data-open]'); if(it){ showCard(+it.dataset.open); return; }
+    const ct = e.target.closest('[data-cite]'); if(ct){ const el = out.querySelector(`[data-n="${ct.dataset.cite}"]`); if(el){ el.scrollIntoView({behavior:'smooth', block:'center'}); el.classList.remove('kb-flash'); void el.offsetWidth; el.classList.add('kb-flash'); } return; }
+    if(e.target.closest('#kbAI')) askAI();
+  });
+  $('kbGo').onclick = () => run();
+  inp.addEventListener('keydown', e => { if(e.key === 'Enter'){ e.preventDefault(); run(); } });
+  let last = null;
+  function srcList(){
+    const by = {}; for(const c of visible()) (by[c.sec] ||= []).push(c);
+    $('kbSrc').innerHTML = `<h5>Джерела · ${visible().length} карток</h5>` + Object.entries(by).map(([s, cs]) => `<details ${last?.hits?.some(h => h.c.sec === s) ? 'open' : ''}><summary>${esc(s)} <span>${cs.length}</span></summary>${cs.map(c => `<button class="kb-it${last?.hits?.some(h => h.c.id === c.id) ? ' on' : ''}" data-open="${c.id}">${esc(c.title)}${c.todo ? ' <i title="є що заповнити">❓</i>' : ''}</button>`).join('')}</details>`).join('')
+      + (staff ? `<p class="kb-note" style="margin-top:12px">Маршрути доставки ДЦ: ${KB.zones ? Object.keys(KB.zones).length + ' зон' : 'не завантажено'}${KB.routesUpd ? ', таблиця від ' + esc(KB.routesUpd) : ''}.</p>` : '');
+  }
+  function showCard(id){ const c = KB.cards.find(x => x.id === id); if(!c) return; last = { q:c.title, hits:[{ c, s:1 }] }; out.innerHTML = cardHtml(c); srcList(); out.scrollIntoView({block:'start'}); }
+  function run(){
+    const q = inp.value.trim(); if(q.length < 2) return;
+    const r = routeAnswer(q), rest = r?.zone ? q.toLowerCase().split(/\s+/).filter(w => !placeOf(q).split(' ').includes(w.replace(/[?!.,;:]/g, ''))).join(' ') : q, hits = search(rest, r?.zone ? 2 : 5);
+    last = { q, hits, route:r };
+    let h = '';
+    if(r?.zone) h += `<div class="kb-ans route" data-n="0"><h4>🚚 ${esc(r.zone)} <small>маршрути ДЦ${KB.routesUpd ? ' · таблиця від ' + esc(KB.routesUpd) : ''}</small></h4><div class="kb-txt"><ul>${r.rows.map(x => `<li><b>${DAY_FULL[x.wd]} ${dm(x.d)}</b> — маршрут «${esc(x.route)}»${x.today ? ' · <span class="todo">сьогодні — якщо ще встигає на машину</span>' : ''}</li>`).join('')}</ul></div><div class="kb-meta"><span>Годину відсічки таблиця не знає — уточніть у логіста. «Львів» без уточнення = машина на магазин ГТ Львів.</span></div></div>`;
+    else if(r?.ask) h += `<div class="kb-ans route"><h4>🚚 Уточніть зону доставки</h4><div class="kb-opts">${r.ask.map(z => `<button class="ghost" data-zone="${esc(z)}">${esc(z)}</button>`).join('')}</div></div>`;
+    else if(r?.miss) h += `<div class="kb-ans route"><h4>🚚 «${esc(r.miss)}» у маршрутах точно не знайшов</h4>${r.like.length ? `<div class="kb-txt">Схожі зони:</div><div class="kb-opts">${r.like.map(z => `<button class="ghost" data-zone="${esc(z)}">${esc(z)}</button>`).join('')}</div>` : ''}<div class="kb-meta"><span>День не вигадую — уточніть зону або спитайте логіста.</span></div></div>`;
+    if(hits.length) h += `<div class="kb-acts"><button class="btn" id="kbAI">✨ Відповідь ШІ з джерел</button><span class="small" style="align-self:center">знайдено ${hits.length} ${hits.length === 1 ? 'картку' : hits.length < 5 ? 'картки' : 'карток'}</span></div>` + hits.map((x, i) => cardHtml(x.c, i + 1).replace('class="kb-ans"', `class="kb-ans" data-n="${i + 1}"`)).join('');
+    else if(!r?.zone) h += `<div class="kb-ans"><h4>У довіднику цього ще нема</h4><div class="kb-txt"><p>Спитайте ${staff ? 'директора магазину (Тарас-Борис Левицький, +38 (063) 334 37 25)' : 'менеджера або гарячу лінію 0-800-305-777'} і натисніть «Запропонувати правку», щоб відповідь зʼявилась тут.</p></div><div class="kb-meta"><button class="ghost" data-fix="0">Запропонувати правку</button></div></div>`;
+    out.innerHTML = h; srcList();
+    if(innerWidth < 900) out.scrollIntoView({ behavior:'smooth', block:'start' });
+    try{ history.replaceState(null, '', location.pathname + location.search + '#dovidnyk'); }catch{}
+  }
+  async function askAI(){
+    if(!last?.hits?.length) return;
+    const btn = $('kbAI'), key = 'kbAI:' + KB.ver + ':' + skel(last.q) + ':' + (staff ? 's' : 'c');
+    const show = t => { const el = document.createElement('div'); el.className = 'kb-ans ai'; el.innerHTML = `<h4>✨ Відповідь <small>лише з карток нижче · MiniMax, temperature 0</small></h4><div class="kb-txt">${rich(t)}</div>`; out.querySelector('.kb-acts')?.replaceWith(el); };
+    const cached = ls.get(key); if(cached){ show(cached); return; }
+    btn.disabled = true; btn.textContent = 'Складаю відповідь…';
+    const src = last.hits.map((x, i) => `[${i + 1}] ${x.c.title} (розділ: ${x.c.sec}; джерело: ${x.c.src})\n${x.c.text.slice(0, 1800)}`).join('\n\n');
+    const route = last.route?.zone ? `[0] Маршрути доставки ДЦ (таблиця від ${KB.routesUpd || '—'})\n${last.route.text}\n\n` : '';
+    const prompt = `Ти — «Довідник ГТ», помічник ${staff ? 'працівників' : 'клієнтів'} магазину «Гаряча Точка» (Львів). Сьогодні ${dm(kyivToday())}.${kyivToday().getUTCFullYear()}.
+ПРАВИЛА: відповідай ТІЛЬКИ з джерел нижче. Нічого не додавай від себе: ні імен, ні телефонів, ні строків, ні цін. Після кожного факту став номер джерела в дужках, напр. [2].
+Якщо відповіді в джерелах нема або там «❓ ЗАПОВНИТИ» — так і скажи: «У довіднику цього ще нема», і порадь спитати ${staff ? 'директора магазину' : 'менеджера'}.
+Пиши українською, на «Ви», коротко: 1–4 речення або короткий список. Без вступів.
+
+ПИТАННЯ: ${last.q}
+
+ДЖЕРЕЛА:
+${route}${src}`;
+    try{
+      const d = await claude([{ role:'user', content:prompt }], { max_tokens:1200, temperature:0, reasoning:'low' });
+      const t = (typeof textOf === 'function' ? textOf(d) : '').replace(/<think>[\s\S]*?<\/think>/g, '').trim() || 'У довіднику цього ще нема.';
+      ls.set(key, t); show(t);
+    }catch(e){ btn.disabled = false; btn.textContent = '✨ Відповідь ШІ з джерел'; if(typeof showErr === 'function') showErr(e.message || 'Не вдалося отримати відповідь ШІ'); }
+  }
+  kbLoad().then(() => { srcList(); if(inp.value.trim()) run(); else out.innerHTML = `<div class="small">Оберіть питання вище або напишіть своє. ${innerWidth < 900 ? 'Нижче' : 'Праворуч'} — усі джерела довідника.</div>`; inp.focus({ preventScroll:true }); })
+    .catch(e => { out.innerHTML = `<div class="err">${esc(e.message)}</div>`; });
+}
+window.openKB = typeof tracked === 'function' ? tracked(openKB) : openKB;
+window.hpKB = { load:kbLoad, search:q => kbLoad().then(() => search(q)), route:q => kbLoad().then(() => routeAnswer(q)), findZone:p => kbLoad().then(() => findZone(p)), parse:parseKB, toks };
+
+// Вкладка «Довідник» для персоналу, пункт у боковому меню для всіх, пряме посилання mm.html#dovidnyk
+if(typeof SH_I !== 'undefined') SH_I.kb = 'M4 4h11a3 3 0 0 1 3 3v13H7a3 3 0 0 1-3-3zM4 17a3 3 0 0 1 3-3h11M9 8h5';
+if(typeof tabGo === 'function'){ const _tg = tabGo; tabGo = function(k){ if(k === 'kb'){ try{ startWork(); }catch{} S.tab = 'kb'; NAV.length = 0; window.openKB(); tabsMark(); return; } return _tg(k); }; }
+if(typeof S !== 'undefined' && S.me && typeof tabsRender === 'function') tabsRender();
+const goHash = () => { if(location.hash === '#dovidnyk') setTimeout(() => window.openKB(), 300); };
+goHash(); addEventListener('hashchange', goHash);
 })();
 </script>
 

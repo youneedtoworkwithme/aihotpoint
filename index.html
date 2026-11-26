@@ -1526,7 +1526,7 @@ async function claude(messages, extra = {}){
   }
   const viaProxy = provider() === 'proxy';
   // reasoning_effort 'low': M3.1 Flash за замовчуванням думає на 'max' і з'їдає весь ліміт токенів
-  const body = { model: viaProxy ? MM.minimax.model : MM.openrouter.model, max_tokens:Math.max(ex.max_tokens||16000, 16000), reasoning_effort:effort, temperature: ex.temperature ?? 0.1, messages:oai };
+  const body = { model: viaProxy ? MM.minimax.model : MM.openrouter.model, max_tokens:Math.max(ex.max_tokens||16000, 16000), reasoning_effort:effort, temperature: ex.temperature ?? 0, messages:oai };
   if(tools.length) body.tools = tools.map(t=>({type:'function', function:{name:t.name, description:t.description, parameters:t.input_schema}}));
   let d;
   if(viaProxy){
