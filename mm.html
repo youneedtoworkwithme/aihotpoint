@@ -1045,7 +1045,7 @@ const $ = id => document.getElementById(id);
 // ТЕСТ: модель MiniMax M3.1 Flash. Ключ MiniMax → напряму api.minimax.io; ключ OpenRouter (sk-or-…) → через openrouter.ai.
 // ── Автооновлення: одне постійне посилання без ?v=. Сторінка сама перевіряє, чи на GitHub не вийшла новіша версія,
 // і тихо перезавантажується (адреса в рядку браузера лишається та сама). При кожному оновленні міняти APP_VER.
-const APP_VER = '2026-11-26.2';
+const APP_VER = '2026-11-26.3';
 const HP_SHOWROOM = { schedule:'Пн–Пт 09:00–18:00', address:'Львів, вул. Зелена, 238, корпус «В»' };
 const HP_MANAGERS = [
   { id:'vlad', name:'Владислав Гірняк', role:'Менеджер', phones:['+38 (067) 534 59 41','+38 (063) 334 36 54'], email:'HirniakVO@hot-point.com.ua', tg:'https://t.me/Manaaggerr03', viber:'+380675345941', url:'https://youneedtoworkwithme.github.io/vlad/' },
@@ -4530,6 +4530,30 @@ addEventListener('hashchange', () => { if(location.hash === '#majster') wizOpen(
 .kb-src .kb-it:hover,.kb-src .kb-it.on{background:var(--tint);color:var(--brand-ink)}
 .kb-src .kb-it i{font-style:normal;color:var(--warn,#8A5A00)}
 .kb-opts{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.kbc{height:calc(100dvh - 140px);min-height:420px}
+.kbc .kb-main{display:flex;flex-direction:column;min-height:0;height:100%}
+.kbc .kb-src{max-height:100%;overflow:auto}
+.kb-feed{flex:1;min-height:0;overflow:auto;display:flex;flex-direction:column;gap:12px;padding:4px 2px 12px}
+.kbm{max-width:92%}.kbm.me{align-self:flex-end}.kbm.ai{align-self:flex-start}
+#kbFeed .kbm.me .bub{background:var(--graphite)!important;color:var(--on-graphite,#fff)!important;opacity:1!important;padding:9px 14px!important;border:0!important;border-radius:16px 16px 4px 16px!important;font-size:14.5px;white-space:pre-wrap;box-shadow:none!important}
+.kbm.ai{background:var(--surface);border:1px solid var(--line);border-radius:16px 16px 16px 4px;padding:10px 14px}
+.kbm .who{font-size:11.5px;font-weight:800;color:var(--brand-ink);text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px}
+.kb-route{margin-top:8px;font-size:13px;background:var(--tint);border-radius:10px;padding:6px 10px}
+.kb-cites{margin-top:8px;font-size:12.5px;color:var(--muted)}.kb-cites summary{cursor:pointer}
+.kb-cites .kb-ans{margin:8px 0 0;font-size:13px}
+.kb-typing{display:flex;align-items:center;gap:4px;color:var(--muted);font-size:13px}
+.kb-typing i{width:6px;height:6px;border-radius:50%!important;background:var(--brand);animation:kbDot 1s infinite ease-in-out}.kb-typing i:nth-child(2){animation-delay:.15s}.kb-typing i:nth-child(3){animation-delay:.3s}.kb-typing span{margin-left:6px}
+@keyframes kbDot{0%,100%{opacity:.25;transform:translateY(0)}50%{opacity:1;transform:translateY(-3px)}}
+.kb-comp{display:flex;gap:6px;align-items:flex-end;border:1.5px solid var(--line);border-radius:16px;background:var(--surface);padding:6px}
+.kb-comp:focus-within{border-color:var(--brand)}
+.kb-comp textarea{flex:1;min-width:0;border:0;outline:0;resize:none;font:inherit;font-size:16px;line-height:1.4;padding:7px 8px;background:transparent;color:var(--fg);max-height:160px}
+.kb-foot{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:12px;color:var(--muted);padding:6px 2px 0}
+.kb-foot button{font-size:12.5px;padding:4px 10px;white-space:nowrap;flex:none}
+.kb-hello{padding:10px 4px}.kb-hello b{font-size:18px}.kb-hello p{color:var(--muted);margin:6px 0 12px;max-width:620px}
+.kb-hello .kb-chips{flex-wrap:wrap!important}
+.kb-pop{position:absolute;inset:0;z-index:20;background:rgba(20,20,20,.35);display:flex;align-items:center;justify-content:center;padding:16px}
+.kb-pop[hidden]{display:none}.kb-popin{background:var(--bg);border-radius:16px;padding:14px;max-width:640px;width:100%;max-height:85%;overflow:auto;display:flex;flex-direction:column;gap:10px}
+@media (max-width:900px){.kbc{height:calc(100dvh - 190px)}.kbc .kb-src{display:none}}
 .kb-flash{animation:kbFlash 1.2s ease}
 @keyframes kbFlash{0%{box-shadow:0 0 0 3px var(--brand)}100%{box-shadow:0 0 0 0 transparent}}
 </style>
@@ -4675,79 +4699,114 @@ function rich(s){
 }
 const cardHtml = (c, n) => `<div class="kb-ans" id="kbc${c.id}" data-card="${c.id}"><h4>${n ? `<span class="kb-cite">${n}</span>` : ''}${esc(c.title)}<small>${esc(c.sec)}${c.aud === 'staff' ? ' · для персоналу' : ''}</small></h4>
   <div class="kb-txt">${rich(c.text)}</div><div class="kb-meta"><span>Джерело: ${esc(c.src || '—')}</span>${c.upd ? `<span>оновлено ${esc(c.upd)}</span>` : ''}<button class="ghost" data-fix="${c.id}">Запропонувати правку</button></div></div>`;
-const CHIPS_STAFF = ['До кого звернутись по видаткову?', 'Коли доставка в Самбір?', 'Коли машина з ДЦ на Львів?', 'Брак насоса Tatra — що робити?', 'Безготівка і відтермінування', 'Як знайти документ у КУП?', 'Що є в наявності на завтра?'];
-const CHIPS_CLIENT = ['Коли доставка?', 'Безкоштовна доставка від якої суми?', 'Адреса і графік магазину', 'Контакти менеджерів', 'Рівні клієнта і бонус за квіз'];
+const CHIPS_STAFF = ['До кого звернутись, якщо треба видаткова?', 'Коли доставка в Самбір?', 'Коли машина з ДЦ на Львів?', 'Клієнт каже «є свій постачальник» — що відповісти?', 'Брак насоса Tatra — що робити?', 'Як знайти документ у КУП?', 'Що казати клієнту про нашу компанію?'];
+const CHIPS_CLIENT = ['Коли доставка і скільки коштує?', 'Хто ви як компанія?', 'Адреса і графік магазину', 'З якими виробниками працюєте?', 'Контакти менеджерів'];
+const isStaffNow = () => typeof isStaff === 'function' && isStaff();
+const chatKey = () => 'kbChat:' + (S.me?.name || 'anon') + ':' + (isStaffNow() ? 's' : 'c');
+const FULL_LIMIT = 60000;   // уся база влазить у запит — модель бачить усі джерела, як NotebookLM
+
+function kbSources(q, hist){
+  const vis = visible(), full = vis.reduce((a, c) => a + c.text.length + c.title.length + 80, 0) <= FULL_LIMIT;
+  const lastQ = hist.filter(m => m.role === 'me').slice(-1)[0]?.text || '';
+  const list = full ? vis : search(q + ' ' + lastQ, 8).map(x => x.c);
+  return list;
+}
+function kbPrompt(q, cards, route, hist){
+  const staff = isStaffNow(), t = kyivToday();
+  const src = cards.map(c => `[${c.id}] ${c.title} (розділ: ${c.sec}; для: ${c.aud === 'staff' ? 'персоналу' : 'всіх'}; джерело: ${c.src}; оновлено: ${c.upd})\n${c.text}`).join('\n\n---\n\n');
+  const h = hist.slice(-6).map(m => (m.role === 'me' ? 'Користувач: ' : 'Довідник: ') + String(m.text).slice(0, 1200)).join('\n');
+  return `Ти — «Довідник ГТ», розумний помічник ${staff ? 'менеджерів і директора' : 'клієнтів'} магазину «Гаряча Точка» (Львів, вул. Зелена, 238; мережа холдингу DUS Level). Працюєш як NotebookLM: твій «блокнот» — джерела нижче. Сьогодні ${DAY_FULL[(t.getUTCDay() + 6) % 7]}, ${dm(t)}.${t.getUTCFullYear()}.
+
+ЯК ВІДПОВІДАТИ:
+- Спілкуйся як живий досвідчений колега: по суті, тепло, на «Ви», українською. Розумій розмовні й неточні питання, суржик, продовження розмови («а якщо…», «а йому що сказати?»).
+- Факти про компанію, людей, телефони, умови, строки, ціни, процедури — ТІЛЬКИ з джерел. Після кожного такого факту став номер джерела в квадратних дужках, напр. [5]. Нічого не вигадуй і не домислюй.
+- Якщо в джерелах цього нема або стоїть «❓ ЗАПОВНИТИ» — чесно скажи «у довіднику цього ще нема» і підкажи, у кого спитати${staff ? ' (директор магазину)' : ' (менеджер або 0-800-305-777)'}.
+- Можна додати загальну пораду з досвіду продажів чи сантехніки, якщо вона допомагає (як відповісти клієнту, що уточнити), — але познач її словами «Порада:» і без номерів джерел; там не може бути конкретних фактів про компанію.
+- ${staff ? 'Коли питають, що сказати клієнту, — дай готову фразу, яку менеджер може сказати чи надіслати.' : 'Не розкривай внутрішніх правил магазину.'}
+- Коротко: 2–6 речень або короткий список. Без вступів на кшталт «Звісно!».
+${h ? `\nПОПЕРЕДНЯ РОЗМОВА:\n${h}\n` : ''}
+ДЖЕРЕЛА:
+${route ? `[0] Маршрути доставки ДЦ (таблиця від ${KB.routesUpd || '—'}): ${route}\n\n---\n\n` : ''}${src}
+
+ПИТАННЯ: ${q}`;
+}
 
 function openKB(q0){
   S.tab = 'kb';
-  const staff = typeof isStaff === 'function' && isStaff();
   const box = viewOpen(`<div class="vhead"><button class="ghost" data-back>←</button><b>Довідник «Гарячої Точки»</b><button class="ghost" data-close>Закрити</button></div>
-    <div class="kb"><div class="kb-main">
-      <div class="kb-ask"><input type="search" id="kbQ" placeholder="${staff ? 'Напр.: до кого звернутись по видаткову? коли доставка в Стрий?' : 'Напр.: коли доставка? до котрої працюєте?'}" autocomplete="off" value="${esc(q0 || '')}">
-        <button class="ic ghost mic" data-mic="kbQ" aria-label="Голосом">${typeof MIC_SVG !== 'undefined' ? MIC_SVG : '🎤'}</button><button class="btn" id="kbGo">Знайти</button></div>
-      <div class="kb-chips">${(staff ? CHIPS_STAFF : CHIPS_CLIENT).map(x => `<button data-q="${esc(x)}">${esc(x)}</button>`).join('')}</div>
-      <p class="kb-note">Відповідаю лише з довідника — нічого не вигадую. Пошук безкоштовний і миттєвий; «Відповідь ШІ» складає коротку відповідь з номерами джерел.</p>
-      <div id="kbOut"><div class="small">Завантажую довідник…</div></div>
+    <div class="kb kbc"><div class="kb-main">
+      <div class="kb-feed" id="kbFeed"></div>
+      <div class="kb-comp"><textarea id="kbQ" rows="1" placeholder="Запитайте своїми словами…"></textarea>
+        <button class="ic ghost mic" data-mic="kbQ" aria-label="Голосом">${typeof MIC_SVG !== 'undefined' ? MIC_SVG : '🎤'}</button>
+        <button class="ic btn" id="kbGo" aria-label="Надіслати"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div>
+      <div class="kb-foot"><span id="kbInfo">Відповідаю з довідника «Гарячої Точки» · MiniMax, temperature 0</span><button class="ghost" id="kbNew">Новий діалог</button></div>
     </div><aside class="kb-src" id="kbSrc"></aside></div>`);
   box.querySelector('[data-back]').onclick = navBack;
-  const inp = $('kbQ'), out = $('kbOut');
-  const fix = id => { const c = KB.cards.find(x => String(x.id) === String(id)); ideaForm('довідник' + (c ? ': ' + c.title : '')); };
-  box.addEventListener('click', e => {
-    const q = e.target.closest('[data-q]'); if(q){ inp.value = q.dataset.q; run(); return; }
-    const f = e.target.closest('[data-fix]'); if(f){ fix(f.dataset.fix); return; }
-    const z = e.target.closest('[data-zone]'); if(z){ inp.value = 'Коли доставка в ' + z.dataset.zone; run(); return; }
-    const it = e.target.closest('[data-open]'); if(it){ showCard(+it.dataset.open); return; }
-    const ct = e.target.closest('[data-cite]'); if(ct){ const el = out.querySelector(`[data-n="${ct.dataset.cite}"]`); if(el){ el.scrollIntoView({behavior:'smooth', block:'center'}); el.classList.remove('kb-flash'); void el.offsetWidth; el.classList.add('kb-flash'); } return; }
-    if(e.target.closest('#kbAI')) askAI();
-  });
-  $('kbGo').onclick = () => run();
-  inp.addEventListener('keydown', e => { if(e.key === 'Enter'){ e.preventDefault(); run(); } });
-  let last = null;
-  function srcList(){
+  const inp = $('kbQ'), feed = $('kbFeed');
+  let chat = ls.get(chatKey()) || [], busy = false;
+  const save = () => ls.set(chatKey(), chat.slice(-40));
+  const grow = () => { inp.style.height = 'auto'; inp.style.height = Math.min(inp.scrollHeight, 160) + 'px'; };
+  inp.addEventListener('input', grow);
+  inp.addEventListener('keydown', e => { if(e.key === 'Enter' && !e.shiftKey){ e.preventDefault(); send(); } });
+  $('kbGo').onclick = () => send();
+  $('kbNew').onclick = () => { chat = []; save(); draw(); inp.focus(); };
+  const cardById = id => KB.cards.find(c => String(c.id) === String(id));
+  function msgHtml(m, i){
+    if(m.role === 'me') return `<div class="kbm me"><div class="bub">${esc(m.text)}</div></div>`;
+    if(m.typing) return `<div class="kbm ai"><div class="who">Довідник ГТ</div><div class="kb-typing"><i></i><i></i><i></i><span>Шукаю в довіднику…</span></div></div>`;
+    const ids = [...new Set((String(m.text).match(/\[(\d{1,2})\]/g) || []).map(x => x.slice(1, -1)))];
+    const cited = ids.map(id => id === '0' ? null : cardById(id)).filter(Boolean);
+    return `<div class="kbm ai" data-i="${i}"><div class="who">Довідник ГТ</div><div class="kb-txt">${rich(m.text)}</div>
+      ${m.route ? `<div class="kb-route">🚚 ${esc(m.route)}</div>` : ''}
+      ${cited.length ? `<details class="kb-cites"><summary>Джерела: ${cited.map(c => `<span class="kb-cite">${c.id}</span> ${esc(c.title)}`).join(' · ')}</summary>${cited.map(c => cardHtml(c, c.id)).join('')}</details>` : ''}
+      ${m.err ? '' : `<div class="kb-meta"><button class="ghost" data-fix="${cited[0]?.id || 0}" data-q="${esc(chat[i - 1]?.text || '')}">Неточно? Запропонувати правку</button></div>`}</div>`;
+  }
+  function draw(){
+    const staff = isStaffNow();
+    feed.innerHTML = chat.length ? chat.map(msgHtml).join('') :
+      `<div class="kb-hello"><b>Привіт${S.me?.name ? ', ' + esc(S.me.name.split(' ')[0]) : ''}!</b><p>Я знаю все, що записано про «Гарячу Точку»: компанію, доставку й маршрути ДЦ, документи, гарантію, КУП, продажі${staff ? ', внутрішні правила' : ''}. Питайте своїми словами — як у звичайному чаті.</p>
+        <div class="kb-chips">${(staff ? CHIPS_STAFF : CHIPS_CLIENT).map(x => `<button data-ask="${esc(x)}">${esc(x)}</button>`).join('')}</div></div>`;
+    feed.scrollTop = feed.scrollHeight;
+  }
+  function srcList(hl = []){
     const by = {}; for(const c of visible()) (by[c.sec] ||= []).push(c);
-    $('kbSrc').innerHTML = `<h5>Джерела · ${visible().length} карток</h5>` + Object.entries(by).map(([s, cs]) => `<details ${last?.hits?.some(h => h.c.sec === s) ? 'open' : ''}><summary>${esc(s)} <span>${cs.length}</span></summary>${cs.map(c => `<button class="kb-it${last?.hits?.some(h => h.c.id === c.id) ? ' on' : ''}" data-open="${c.id}">${esc(c.title)}${c.todo ? ' <i title="є що заповнити">❓</i>' : ''}</button>`).join('')}</details>`).join('')
-      + (staff ? `<p class="kb-note" style="margin-top:12px">Маршрути доставки ДЦ: ${KB.zones ? Object.keys(KB.zones).length + ' зон' : 'не завантажено'}${KB.routesUpd ? ', таблиця від ' + esc(KB.routesUpd) : ''}.</p>` : '');
+    $('kbSrc').innerHTML = `<h5>Блокнот · ${visible().length} джерел</h5>` + Object.entries(by).map(([s, cs]) => `<details ${cs.some(c => hl.includes(String(c.id))) ? 'open' : ''}><summary>${esc(s)} <span>${cs.length}</span></summary>${cs.map(c => `<button class="kb-it${hl.includes(String(c.id)) ? ' on' : ''}" data-open="${c.id}">${esc(c.title)}${c.todo ? ' <i title="є що заповнити">❓</i>' : ''}</button>`).join('')}</details>`).join('')
+      + (isStaffNow() && KB.zones ? `<p class="kb-note" style="margin-top:12px">+ маршрути доставки ДЦ: ${Object.keys(KB.zones).length} зон${KB.routesUpd ? ', таблиця від ' + esc(KB.routesUpd) : ''}.</p>` : '');
   }
-  function showCard(id){ const c = KB.cards.find(x => x.id === id); if(!c) return; last = { q:c.title, hits:[{ c, s:1 }] }; out.innerHTML = cardHtml(c); srcList(); out.scrollIntoView({block:'start'}); }
-  function run(){
-    const q = inp.value.trim(); if(q.length < 2) return;
-    const r = routeAnswer(q), rest = r?.zone ? q.toLowerCase().split(/\s+/).filter(w => !placeOf(q).split(' ').includes(w.replace(/[?!.,;:]/g, ''))).join(' ') : q, hits = search(rest, r?.zone ? 2 : 5);
-    last = { q, hits, route:r };
-    let h = '';
-    if(r?.zone) h += `<div class="kb-ans route" data-n="0"><h4>🚚 ${esc(r.zone)} <small>маршрути ДЦ${KB.routesUpd ? ' · таблиця від ' + esc(KB.routesUpd) : ''}</small></h4><div class="kb-txt"><ul>${r.rows.map(x => `<li><b>${DAY_FULL[x.wd]} ${dm(x.d)}</b> — маршрут «${esc(x.route)}»${x.today ? ' · <span class="todo">сьогодні — якщо ще встигає на машину</span>' : ''}</li>`).join('')}</ul></div><div class="kb-meta"><span>Годину відсічки таблиця не знає — уточніть у логіста. «Львів» без уточнення = машина на магазин ГТ Львів.</span></div></div>`;
-    else if(r?.ask) h += `<div class="kb-ans route"><h4>🚚 Уточніть зону доставки</h4><div class="kb-opts">${r.ask.map(z => `<button class="ghost" data-zone="${esc(z)}">${esc(z)}</button>`).join('')}</div></div>`;
-    else if(r?.miss) h += `<div class="kb-ans route"><h4>🚚 «${esc(r.miss)}» у маршрутах точно не знайшов</h4>${r.like.length ? `<div class="kb-txt">Схожі зони:</div><div class="kb-opts">${r.like.map(z => `<button class="ghost" data-zone="${esc(z)}">${esc(z)}</button>`).join('')}</div>` : ''}<div class="kb-meta"><span>День не вигадую — уточніть зону або спитайте логіста.</span></div></div>`;
-    if(hits.length) h += `<div class="kb-acts"><button class="btn" id="kbAI">✨ Відповідь ШІ з джерел</button><span class="small" style="align-self:center">знайдено ${hits.length} ${hits.length === 1 ? 'картку' : hits.length < 5 ? 'картки' : 'карток'}</span></div>` + hits.map((x, i) => cardHtml(x.c, i + 1).replace('class="kb-ans"', `class="kb-ans" data-n="${i + 1}"`)).join('');
-    else if(!r?.zone) h += `<div class="kb-ans"><h4>У довіднику цього ще нема</h4><div class="kb-txt"><p>Спитайте ${staff ? 'директора магазину (Тарас-Борис Левицький, +38 (063) 334 37 25)' : 'менеджера або гарячу лінію 0-800-305-777'} і натисніть «Запропонувати правку», щоб відповідь зʼявилась тут.</p></div><div class="kb-meta"><button class="ghost" data-fix="0">Запропонувати правку</button></div></div>`;
-    out.innerHTML = h; srcList();
-    if(innerWidth < 900) out.scrollIntoView({ behavior:'smooth', block:'start' });
-    try{ history.replaceState(null, '', location.pathname + location.search + '#dovidnyk'); }catch{}
-  }
-  async function askAI(){
-    if(!last?.hits?.length) return;
-    const btn = $('kbAI'), key = 'kbAI:' + KB.ver + ':' + skel(last.q) + ':' + (staff ? 's' : 'c');
-    const show = t => { const el = document.createElement('div'); el.className = 'kb-ans ai'; el.innerHTML = `<h4>✨ Відповідь <small>лише з карток нижче · MiniMax, temperature 0</small></h4><div class="kb-txt">${rich(t)}</div>`; out.querySelector('.kb-acts')?.replaceWith(el); };
-    const cached = ls.get(key); if(cached){ show(cached); return; }
-    btn.disabled = true; btn.textContent = 'Складаю відповідь…';
-    const src = last.hits.map((x, i) => `[${i + 1}] ${x.c.title} (розділ: ${x.c.sec}; джерело: ${x.c.src})\n${x.c.text.slice(0, 1800)}`).join('\n\n');
-    const route = last.route?.zone ? `[0] Маршрути доставки ДЦ (таблиця від ${KB.routesUpd || '—'})\n${last.route.text}\n\n` : '';
-    const prompt = `Ти — «Довідник ГТ», помічник ${staff ? 'працівників' : 'клієнтів'} магазину «Гаряча Точка» (Львів). Сьогодні ${dm(kyivToday())}.${kyivToday().getUTCFullYear()}.
-ПРАВИЛА: відповідай ТІЛЬКИ з джерел нижче. Нічого не додавай від себе: ні імен, ні телефонів, ні строків, ні цін. Після кожного факту став номер джерела в дужках, напр. [2].
-Якщо відповіді в джерелах нема або там «❓ ЗАПОВНИТИ» — так і скажи: «У довіднику цього ще нема», і порадь спитати ${staff ? 'директора магазину' : 'менеджера'}.
-Пиши українською, на «Ви», коротко: 1–4 речення або короткий список. Без вступів.
-
-ПИТАННЯ: ${last.q}
-
-ДЖЕРЕЛА:
-${route}${src}`;
+  box.addEventListener('click', e => {
+    const a = e.target.closest('[data-ask]'); if(a){ inp.value = a.dataset.ask; send(); return; }
+    const f = e.target.closest('[data-fix]'); if(f){ const c = cardById(f.dataset.fix); ideaForm('довідник' + (f.dataset.q ? ' · питання: ' + f.dataset.q : '') + (c ? ' · картка: ' + c.title : '')); return; }
+    const it = e.target.closest('[data-open]'); if(it){ const c = cardById(it.dataset.open); if(!c) return;
+      let pop = $('kbPop'); if(!pop){ pop = document.createElement('div'); pop.id = 'kbPop'; pop.className = 'kb-pop'; box.appendChild(pop); }
+      pop.innerHTML = `<div class="kb-popin"><div class="row between"><b>Джерело</b><button class="ghost" data-popx>Закрити</button></div>${cardHtml(c, c.id)}<button class="btn" data-ask="${esc('Розкажи коротко: ' + c.title)}">Запитати про це</button></div>`; pop.hidden = false; return; }
+    if(e.target.closest('[data-popx]') || e.target.id === 'kbPop'){ $('kbPop').hidden = true; return; }
+    const ct = e.target.closest('.kb-txt .kb-cite'); if(ct){ const d = ct.closest('.kbm')?.querySelector('.kb-cites'); if(d){ d.open = true; d.querySelector(`[data-card="${ct.dataset.cite}"]`)?.scrollIntoView({ behavior:'smooth', block:'center' }); } }
+  });
+  async function send(){
+    const q = inp.value.trim(); if(!q || busy) return;
+    if($('kbPop')) $('kbPop').hidden = true;
+    busy = true; inp.value = ''; grow();
+    const hist = chat.filter(m => !m.typing && !m.err);
+    chat.push({ role:'me', text:q }); const w = { role:'ai', typing:true }; chat.push(w); draw();
     try{
-      const d = await claude([{ role:'user', content:prompt }], { max_tokens:1200, temperature:0, reasoning:'low' });
-      const t = (typeof textOf === 'function' ? textOf(d) : '').replace(/<think>[\s\S]*?<\/think>/g, '').trim() || 'У довіднику цього ще нема.';
-      ls.set(key, t); show(t);
-    }catch(e){ btn.disabled = false; btn.textContent = '✨ Відповідь ШІ з джерел'; if(typeof showErr === 'function') showErr(e.message || 'Не вдалося отримати відповідь ШІ'); }
+      await kbLoad();
+      const r = routeAnswer(q) || routeAnswer(hist.filter(m => m.role === 'me').slice(-1)[0]?.text + ' ' + q);
+      const route = r?.zone ? r.text : r?.ask ? `Назва неоднозначна, уточнити зону: ${r.ask.join(' / ')}` : r?.miss ? `Зону «${r.miss}» у маршрутах не знайдено${r.like.length ? '; схожі: ' + r.like.join(', ') : ''}` : '';
+      const cards = kbSources(q, hist), key = 'kbA:' + KB.ver + ':' + skel(q) + ':' + (isStaffNow() ? 's' : 'c') + ':' + route;
+      let text = !hist.length ? ls.get(key) : null;
+      if(!text){
+        const d = await claude([{ role:'user', content:kbPrompt(q, cards, route, hist) }], { max_tokens:1500, temperature:0, reasoning:'low' });
+        text = (typeof textOf === 'function' ? textOf(d) : '').replace(/<think>[\s\S]*?<\/think>/g, '').trim() || 'У довіднику цього ще нема.';
+        if(!hist.length) ls.set(key, text);
+      }
+      Object.assign(w, { typing:false, text, route:r?.zone ? r.text : '' });
+      srcList([...new Set((text.match(/\[(\d{1,2})\]/g) || []).map(x => x.slice(1, -1)))]);
+    }catch(e){ Object.assign(w, { typing:false, err:true, text:'Не вдалося отримати відповідь: ' + (e.message || 'помилка') + '. Спробуйте ще раз.' }); }
+    busy = false; save(); draw(); inp.focus({ preventScroll:true });
   }
-  kbLoad().then(() => { srcList(); if(inp.value.trim()) run(); else out.innerHTML = `<div class="small">Оберіть питання вище або напишіть своє. ${innerWidth < 900 ? 'Нижче' : 'Праворуч'} — усі джерела довідника.</div>`; inp.focus({ preventScroll:true }); })
-    .catch(e => { out.innerHTML = `<div class="err">${esc(e.message)}</div>`; });
+  draw();
+  kbLoad().then(() => { srcList(); draw(); if(q0){ inp.value = q0; send(); } inp.focus({ preventScroll:true }); })
+    .catch(e => { feed.innerHTML = `<div class="err">${esc(e.message)}</div>`; });
 }
 window.openKB = typeof tracked === 'function' ? tracked(openKB) : openKB;
 window.hpKB = { load:kbLoad, search:q => kbLoad().then(() => search(q)), route:q => kbLoad().then(() => routeAnswer(q)), findZone:p => kbLoad().then(() => findZone(p)), parse:parseKB, toks };
