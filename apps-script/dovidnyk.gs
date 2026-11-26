@@ -17,7 +17,8 @@ const SHEET_ID = '10uX5SjNpgZu3ss61UbjLQ6Jwmuwu0M-VZ1gSHBzogI8';           // т
 const FOLDER_ID = '1W4oMy3_ERUpbFWPcY5mILMZtBj9VjeSZ';                     // «РОЗРОБКА ШІ ХОТПОІНТ»
 const ROUTES_DOC = '1GKljrC0eUdNL80w2KNiXRVVyJGiez0YbWxVSd2G1QUA';    // «Маршрути доставки ДЦ — для NotebookLM»
 // безкоштовні моделі Gemini API, по черзі: якщо одна вичерпала ліміт (429) або недоступна — береться наступна
-const MODELS = ['gemini-3.8-flash', 'gemini-3.6-flash', 'gemini-3.5-flash-lite', 'gemini-flash-latest', 'gemini-flash-lite-latest'];
+// (перевірено 26.11.2026: flash-lite відповідає за ~1 с; flash часто 503 «high demand»)
+const MODELS = ['gemini-3.5-flash-lite', 'gemini-flash-lite-latest', 'gemini-3.6-flash', 'gemini-3.8-flash', 'gemini-flash-latest'];
 const P = PropertiesService.getScriptProperties();
 
 // ── Веб-додаток ──
@@ -145,4 +146,19 @@ function setup(){
   Logger.log('Довідник: %s карток. Маршрути: https://docs.google.com/document/d/%s', n, P.getProperty('ROUTES_DOC_ID') || ROUTES_DOC);
   if(!P.getProperty('GEMINI_KEY')) Logger.log('⚠️ Додайте GEMINI_KEY у Властивості скрипта (ключ з https://aistudio.google.com/apikey)');
   else Logger.log('Тест: %s', JSON.stringify(ask_({ q:'До кого звернутись по видатковій?', staff:true, name:'setup' })).slice(0, 500));
+}
+
+// ── Діагностика: які безкоштовні моделі відповідають і як швидко ──
+function testGemini(){
+  const key = P.getProperty('GEMINI_KEY');
+  for(const model of MODELS){
+    const t = Date.now();
+    const r = UrlFetchApp.fetch('https://generativelanguage.googleapis.com/v1beta/models/' + model + ':generateContent', { method:'post', contentType:'application/json', muteHttpExceptions:true, headers:{ 'x-goog-api-key':key },
+      payload:JSON.stringify({ contents:[{ role:'user', parts:[{ text:'Скажи «ок»' }] }], generationConfig:{ temperature:0, maxOutputTokens:50 } }) });
+    Logger.log('%s → %s за %s мс: %s', model, r.getResponseCode(), Date.now() - t, r.getContentText().slice(0, 160));
+  }
+}
+function testAsk(){
+  const t = Date.now(); const r = ask_({ q:'Клієнт просить видаткову — до кого звернутись?', staff:true, name:'тест' });
+  Logger.log('%s мс: %s', Date.now() - t, JSON.stringify(r).slice(0, 900));
 }

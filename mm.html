@@ -1045,7 +1045,7 @@ const $ = id => document.getElementById(id);
 // ТЕСТ: модель MiniMax M3.1 Flash. Ключ MiniMax → напряму api.minimax.io; ключ OpenRouter (sk-or-…) → через openrouter.ai.
 // ── Автооновлення: одне постійне посилання без ?v=. Сторінка сама перевіряє, чи на GitHub не вийшла новіша версія,
 // і тихо перезавантажується (адреса в рядку браузера лишається та сама). При кожному оновленні міняти APP_VER.
-const APP_VER = '2026-11-26.5';
+const APP_VER = '2026-11-26.6';
 const HP_SHOWROOM = { schedule:'Пн–Пт 09:00–18:00', address:'Львів, вул. Зелена, 238, корпус «В»' };
 const HP_MANAGERS = [
   { id:'vlad', name:'Владислав Гірняк', role:'Менеджер', phones:['+38 (067) 534 59 41','+38 (063) 334 36 54'], email:'HirniakVO@hot-point.com.ua', tg:'https://t.me/Manaaggerr03', viber:'+380675345941', url:'https://youneedtoworkwithme.github.io/vlad/' },
@@ -4693,7 +4693,7 @@ function routeAnswer(q){
 // ── Показ ──
 function rich(s){
   const inl = t => esc(t).replace(/(https?:\/\/[^\s<]+[^\s<.,;:)!?»])/g, '<a href="$1" target="_blank" rel="noopener">$1</a>').replace(/\*\*(.+?)\*\*/g, '<b>$1</b>')
-    .replace(/`([^`]+)`/g, '<code>$1</code>').replace(/❓([^.\n]*)/g, '<span class="todo">❓$1</span>').replace(/\[(\d{1,2})\]/g, '<button class="kb-cite" data-cite="$1">$1</button>');
+    .replace(/`([^`]+)`/g, '<code>$1</code>').replace(/❓([^.\n]*)/g, '<span class="todo">❓$1</span>').replace(/\[(\d{1,2}(?:\s*,\s*\d{1,2})*)\]/g, (m, g) => g.split(/\s*,\s*/).map(n => `<button class="kb-cite" data-cite="${n}">${n}</button>`).join(''));
   const out = []; let list = null;
   for(const ln of String(s).split('\n')){
     const ul = ln.match(/^\s*[-•*]\s+(.*)/), ol = ln.match(/^\s*\d+[.)]\s+(.*)/);
@@ -4761,7 +4761,7 @@ function openKB(q0){
   function msgHtml(m, i){
     if(m.role === 'me') return `<div class="kbm me"><div class="bub">${esc(m.text)}</div></div>`;
     if(m.typing) return `<div class="kbm ai"><div class="who">Довідник ГТ</div><div class="kb-typing"><i></i><i></i><i></i><span>Шукаю в довіднику…</span></div></div>`;
-    const ids = [...new Set((String(m.text).match(/\[(\d{1,2})\]/g) || []).map(x => x.slice(1, -1)))];
+    const ids = [...new Set((String(m.text).match(/\[\d{1,2}(?:\s*,\s*\d{1,2})*\]/g) || []).flatMap(x => x.slice(1, -1).split(/\s*,\s*/)))];
     const cited = ids.map(id => id === '0' ? null : cardById(id)).filter(Boolean);
     return `<div class="kbm ai" data-i="${i}"><div class="who">Довідник ГТ</div><div class="kb-txt">${rich(m.text)}</div>
       ${m.route ? `<div class="kb-route">🚚 ${esc(m.route)}</div>` : ''}
@@ -4813,7 +4813,7 @@ function openKB(q0){
         if(!hist.length) ls.set(key, text);
       }
       Object.assign(w, { typing:false, text, route:r?.zone ? r.text : '' });
-      srcList([...new Set((text.match(/\[(\d{1,2})\]/g) || []).map(x => x.slice(1, -1)))]);
+      srcList([...new Set((text.match(/\[\d{1,2}(?:\s*,\s*\d{1,2})*\]/g) || []).flatMap(x => x.slice(1, -1).split(/\s*,\s*/)))]);
     }catch(e){ Object.assign(w, { typing:false, err:true, text:'Не вдалося отримати відповідь: ' + (e.message || 'помилка') + '. Спробуйте ще раз.' }); }
     busy = false; save(); draw(); inp.focus({ preventScroll:true });
   }
