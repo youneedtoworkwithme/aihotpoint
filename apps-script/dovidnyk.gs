@@ -21,20 +21,40 @@ const ROUTES_DOC = '1GKljrC0eUdNL80w2KNiXRVVyJGiez0YbWxVSd2G1QUA';    // «Ма�
 const MODELS = ['gemini-3.5-flash-lite', 'gemini-flash-lite-latest', 'gemini-3.6-flash', 'gemini-3.8-flash', 'gemini-flash-latest'];
 const P = PropertiesService.getScriptProperties();
 
-// ── Веб-додаток ──
-function doGet(e){
-  const a = (e && e.parameter && e.parameter.action) || 'kb';
-  if(a === 'kb') return out_({ ok:true, md:kbMarkdown_(), ver:kbVersion_() });
-  if(a === 'ping') return out_({ ok:true, key:!!P.getProperty('GEMINI_KEY'), doc:DOC_ID });
-  return out_({ ok:false, error:'невідома дія' });
-}
+// ── Веб-додаток: відповідає тільки тим, хто увійшов у Hotpoint.ai ──
+// Сайт надсилає токен користувача; перевіряємо його на основному проксі Hotpoint.ai (дія «me»).
+const MAIN_PROXY = 'https://script.google.com/macros/s/AKfycbxUcsHI9dwTH3pIKess3OKjIlpSBeBZxOcV-oZKR-yRBJSfxY_dpDe57JAiqNAwzo4p/exec';
+function doGet(e){ return out_({ ok:true, service:'Довідник ГТ' }); }   // без токена нічого не віддаємо
 function doPost(e){
   try{
     const b = JSON.parse(e.postData.contents || '{}');
-    if(b.action === 'ask') return out_(ask_(b));
-    if(b.action === 'kb') return out_({ ok:true, md:kbMarkdown_(), ver:kbVersion_() });
+    const me = who_(b.token);
+    if(!me) return out_({ ok:false, status:401, error:'Увійдіть у Hotpoint.ai, щоб користуватися довідником' });
+    const staff = me.role !== 'клієнт';
+    if(b.action === 'ask') return out_(ask_({ q:b.q, history:b.history, route:staff ? b.route : '', staff, name:me.name }));
+    if(b.action === 'kb') return out_({ ok:true, md:filterMd_(kbMarkdown_(), staff), ver:kbVersion_(), role:me.role });
     return out_({ ok:false, error:'невідома дія' });
   }catch(err){ return out_({ ok:false, error:String(err.message || err) }); }
+}
+// Хто це: токен → { role, name } з основного проксі; кеш 30 хв (невдала перевірка — 2 хв)
+function who_(token){
+  if(!token || String(token).length < 8) return null;
+  const c = CacheService.getScriptCache(), k = 'who:' + Utilities.base64EncodeWebSafe(Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, String(token))).slice(0, 40);
+  const hit = c.get(k); if(hit) return hit === '-' ? null : JSON.parse(hit);
+  let me = null;
+  try{
+    const r = UrlFetchApp.fetch(MAIN_PROXY, { method:'post', contentType:'text/plain', payload:JSON.stringify({ token:String(token), action:'me' }), muteHttpExceptions:true });
+    const w = JSON.parse(r.getContentText() || '{}');
+    if(w.status === 200 && w.data) me = { role:String(w.data.role || 'менеджер'), name:String(w.data.name || '') };
+  }catch(e){}
+  c.put(k, me ? JSON.stringify(me) : '-', me ? 1800 : 120);
+  return me;
+}
+// Клієнтам — лише картки «для: всі»
+function filterMd_(md, staff){
+  if(staff) return md;
+  const parts = md.split(/^(?=##\s)/m);
+  return parts.filter((p, i) => i === 0 || !/^\s*[-*]\s*для\s*:\s*персонал/im.test(p.split('\n').slice(1, 8).join('\n'))).join('');
 }
 const out_ = o => ContentService.createTextOutput(JSON.stringify(o)).setMimeType(ContentService.MimeType.JSON);
 
@@ -89,12 +109,17 @@ function ask_(b){
 ${b.route ? `[0] Маршрути доставки ДЦ (пораховано на сайті): ${String(b.route).slice(0, 1500)}\n\n---\n\n` : ''}${src}`;
   const contents = hist.map(m => ({ role:m.role === 'me' ? 'user' : 'model', parts:[{ text:String(m.text || '').slice(0, 1500) }] }));
   contents.push({ role:'user', parts:[{ text:q }] });
+  // Наявність/залишки: поки дивимось на сайті hot-point.com.ua через безкоштовний пошук Google (grounding)
+  const stockQ = /наявн|залишк|на складі|в наличии|остат|скільки є|чи є\s/i.test(q);
+  const sysFull = sys + (stockQ ? `\n\nНАЯВНІСТЬ: питання про наявність/залишки. Пошукай товар на сайті hot-point.com.ua (site:hot-point.com.ua) і скажи, що показує сайт (є / немає / під замовлення, ціна з сайту) з посиланням. Додай: «Точну наявність на складі ГТ 31 підтверджує менеджер». Якщо нічого не знайшов — так і скажи.` : '');
   const models = (P.getProperty('GEMINI_MODELS') || MODELS.join(',')).split(',').map(s => s.trim()).filter(Boolean);
   let last = '';
-  for(const model of models){
-    const r = UrlFetchApp.fetch('https://generativelanguage.googleapis.com/v1beta/models/' + model + ':generateContent', {
+  const call = (model, tools) => UrlFetchApp.fetch('https://generativelanguage.googleapis.com/v1beta/models/' + model + ':generateContent', {
       method:'post', contentType:'application/json', muteHttpExceptions:true, headers:{ 'x-goog-api-key':key },
-      payload:JSON.stringify({ systemInstruction:{ parts:[{ text:sys }] }, contents, generationConfig:{ temperature:0, maxOutputTokens:4000 } }) });
+      payload:JSON.stringify(Object.assign({ systemInstruction:{ parts:[{ text:sysFull }] }, contents, generationConfig:{ temperature:0, maxOutputTokens:4000 } }, tools ? { tools:[{ google_search:{} }] } : {})) });
+  for(const model of models){
+    let r = call(model, stockQ);
+    if(stockQ && r.getResponseCode() === 400) r = call(model, false);   // модель без пошуку — відповідаємо з довідника
     const code = r.getResponseCode(), j = JSON.parse(r.getContentText() || '{}');
     if(code === 200){
       const text = ((j.candidates || [])[0]?.content?.parts || []).filter(p => !p.thought).map(p => p.text || '').join('').trim() || 'У довіднику цього ще нема.';
