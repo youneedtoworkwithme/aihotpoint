@@ -1045,7 +1045,7 @@ const $ = id => document.getElementById(id);
 // ТЕСТ: модель MiniMax M3.1 Flash. Ключ MiniMax → напряму api.minimax.io; ключ OpenRouter (sk-or-…) → через openrouter.ai.
 // ── Автооновлення: одне постійне посилання без ?v=. Сторінка сама перевіряє, чи на GitHub не вийшла новіша версія,
 // і тихо перезавантажується (адреса в рядку браузера лишається та сама). При кожному оновленні міняти APP_VER.
-const APP_VER = '2026-11-26.10';
+const APP_VER = '2026-11-26.11';
 const HP_SHOWROOM = { schedule:'Пн–Пт 09:00–18:00', address:'Львів, вул. Зелена, 238, корпус «В»' };
 const HP_MANAGERS = [
   { id:'vlad', name:'Владислав Гірняк', role:'Менеджер', phones:['+38 (067) 534 59 41','+38 (063) 334 36 54'], email:'HirniakVO@hot-point.com.ua', tg:'https://t.me/Manaaggerr03', viber:'+380675345941', url:'https://youneedtoworkwithme.github.io/vlad/' },
@@ -4530,8 +4530,8 @@ addEventListener('hashchange', () => { if(location.hash === '#majster') wizOpen(
 .kb-src .kb-it:hover,.kb-src .kb-it.on{background:var(--tint);color:var(--brand-ink)}
 .kb-src .kb-it i{font-style:normal;color:var(--warn,#8A5A00)}
 .kb-opts{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
-#cliSheet.view>div:has(.kbc){max-width:1200px;padding:14px 18px 16px!important;overflow:hidden}
-.kbc{height:calc(100dvh - var(--vt,0px) - var(--vb,0px) - 110px);min-height:440px;grid-template-columns:minmax(0,1fr) 300px;gap:18px}
+#cliSheet.view>div:has(.kbc){max-width:1240px;width:100%;padding:14px 18px 16px!important;overflow:hidden;background:transparent!important;box-shadow:none!important;border:0!important}
+.kbc{height:100%;min-height:440px;grid-template-columns:minmax(0,1fr) 300px;gap:18px}
 .kbc .kb-main{display:flex;flex-direction:column;min-height:0;height:100%;background:var(--sunk);border:1px solid var(--line);border-radius:22px;overflow:hidden}
 .kbc .kb-src{max-height:100%;overflow:auto;background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:16px 14px}
 /* шапка */
@@ -4619,7 +4619,24 @@ addEventListener('hashchange', () => { if(location.hash === '#majster') wizOpen(
 .kb-src .kb-it i{font-style:normal;margin-left:auto;flex:none;width:7px;height:7px;border-radius:50%;background:var(--warn);margin-top:5px}
 .kb-pop{position:fixed;inset:0;z-index:200;background:rgba(20,20,20,.4);display:flex;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(2px)}
 .kb-pop[hidden]{display:none}.kb-popin{background:var(--bg);border-radius:20px;padding:16px;max-width:660px;width:100%;max-height:85%;overflow:auto;display:flex;flex-direction:column;gap:12px;box-shadow:0 20px 50px rgba(0,0,0,.25)}
-@media (max-width:900px){#cliSheet.view>div:has(.kbc){padding:8px 8px 10px!important}.kbc{height:calc(100dvh - var(--vt,0px) - var(--vb,0px) - 90px);grid-template-columns:minmax(0,1fr)}.kbc .kb-src{display:none}}
+@media (max-width:900px){#cliSheet.view>div:has(.kbc){padding:8px 8px 10px!important}.kbc{grid-template-columns:minmax(0,1fr)}.kbc .kb-src{display:none}}
+/* перебиваємо загальні стилі кнопок сайту */
+.kbc .kb-it,.kbc .kb-act button,.kbc .kb-sc,.kbc .kb-topic,#kbFeed .kb-topic{border-color:transparent}
+.kbc .kb-src .kb-it,.kbc .kb-act button{border:0!important;background:transparent!important;color:inherit;font-weight:500}
+.kbc .kb-src .kb-it:hover,.kbc .kb-src .kb-it.on{background:var(--tint)!important;color:var(--brand-ink)}
+.kbc .kb-act button{color:var(--muted)!important;font-size:12px!important;padding:3px 8px!important}
+.kbc .kb-act button:hover{background:var(--sunk)!important;color:var(--fg)!important}
+.kbc .kb-sc{border:1px solid var(--line)!important;background:var(--sunk)!important;border-radius:999px!important;padding:3px 10px 3px 3px!important;font-weight:500}
+.kbc .kb-sc:hover{border-color:var(--brand)!important}
+.kbc .kb-sc b,.kbc .kb-cite{border-radius:999px!important}
+#kbFeed .kb-topic{border:1px solid var(--line)!important;background:var(--surface)!important;border-radius:16px!important;padding:13px 14px!important;font-weight:400;text-align:left}
+#kbFeed .kb-topic:hover{border-color:var(--brand)!important}
+.kbc .kb-tb a,.kbc .kb-tb button{border:1px solid var(--line)!important;border-radius:10px!important;background:var(--surface)!important;padding:0 12px!important}
+.kbc .kb-tb a:hover,.kbc .kb-tb button:hover{border-color:var(--brand)!important}
+.kbc .kb-top [data-back]{border:0!important;background:transparent!important;font-size:18px;padding:4px 8px!important}
+.kbc .kb-cite{border:0!important}
+.kbc .kb-logo,.kbc .kb-av,.kbc .kb-topic .ti{border-radius:12px!important}
+.kbc .kb-comp .btn.ic{border-radius:14px!important}
 .kb-flash{animation:kbFlash 1.2s ease}
 @keyframes kbFlash{0%{box-shadow:0 0 0 3px var(--brand)}100%{box-shadow:0 0 0 0 transparent}}
 </style>
