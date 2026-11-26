@@ -1045,7 +1045,7 @@ const $ = id => document.getElementById(id);
 // ТЕСТ: модель MiniMax M3.1 Flash. Ключ MiniMax → напряму api.minimax.io; ключ OpenRouter (sk-or-…) → через openrouter.ai.
 // ── Автооновлення: одне постійне посилання без ?v=. Сторінка сама перевіряє, чи на GitHub не вийшла новіша версія,
 // і тихо перезавантажується (адреса в рядку браузера лишається та сама). При кожному оновленні міняти APP_VER.
-const APP_VER = '2026-11-26.3';
+const APP_VER = '2026-11-26.4';
 const HP_SHOWROOM = { schedule:'Пн–Пт 09:00–18:00', address:'Львів, вул. Зелена, 238, корпус «В»' };
 const HP_MANAGERS = [
   { id:'vlad', name:'Владислав Гірняк', role:'Менеджер', phones:['+38 (067) 534 59 41','+38 (063) 334 36 54'], email:'HirniakVO@hot-point.com.ua', tg:'https://t.me/Manaaggerr03', viber:'+380675345941', url:'https://youneedtoworkwithme.github.io/vlad/' },
@@ -4560,6 +4560,10 @@ addEventListener('hashchange', () => { if(location.hash === '#majster') wizOpen(
 <script>
 (() => {
 const KB = { cards:null, zones:null, ver:'', loading:null };
+// Безкоштовний режим: Apps Script «Довідник ГТ» (apps-script/dovidnyk.gs) читає Google Doc — той самий, що в NotebookLM, — і відповідає через Gemini API free tier.
+const KB_GS = '';           // URL веб-додатку …/exec після розгортання; поки порожньо — запасний варіант MiniMax
+const NOTEBOOK_URL = '';    // посилання на ноутбук «Довідник ГТ» у NotebookLM (поділитися → перегляд)
+const KB_DOC_URL = 'https://docs.google.com/document/d/1OpYT7Qji1XTvK5yB5iz5DAXw4PuUhC-15rsJCVh_FmM/edit';
 const KB_URL = 'kb/hotpoint-kb.md', KB_ROUTES = 'kb/dostavka.json';
 const DAY_UA = ['пн','вт','ср','чт','пт','сб','нд'], DAY_FULL = ['понеділок','вівторок','середа','четвер','пʼятниця','субота','неділя'];
 
@@ -4581,12 +4585,13 @@ function toks(s){
 
 // ── Розбір kb/hotpoint-kb.md: «## Назва», службові рядки «- для:», далі текст ──
 function parseKB(md){
-  md = md.replace(/<!--[\s\S]*?-->/g, '');
+  md = md.replace(/<!--[\s\S]*?-->/g, '').replace(/\\([\\`*_{}\[\]()#+\-.!>~|:=])/g, '$1').replace(/\[([^\]]+)\]\((https?:[^)]+)\)/g, (m, t, u) => t === u ? u : t + ' (' + u + ')')
+    .replace(/[ \t]+\n/g, '\n').replace(/\n-\s*\n/g, '\n').replace(/^\*\s/gm, '- ');
   const out = [];
   for(const part of md.split(/^##\s+/m).slice(1)){
     const lines = part.split('\n'), title = lines.shift().trim(), meta = {};
-    while(lines.length && /^\s*-\s*(для|розділ|питання|джерело|оновлено)\s*:/i.test(lines[0])){
-      const m = lines.shift().replace(/^\s*-\s*/, '').match(/^([^:]+):\s*(.*)$/); if(m) meta[m[1].trim().toLowerCase()] = m[2].trim(); }
+    while(lines.length && (/^\s*$/.test(lines[0]) || /^\s*[-*]\s*(для|розділ|питання|джерело|оновлено)\s*:/i.test(lines[0]))){
+      const m = lines.shift().replace(/^\s*[-*]\s*/, '').match(/^([^:]+):\s*(.*)$/); if(m) meta[m[1].trim().toLowerCase()] = m[2].trim(); }
     const text = lines.join('\n').trim();
     out.push({ id:out.length + 1, title, text, aud:/персонал|staff/i.test(meta['для'] || '') ? 'staff' : 'all', sec:meta['розділ'] || 'Інше',
       qs:meta['питання'] || '', src:meta['джерело'] || '', upd:meta['оновлено'] || '', todo:/❓/.test(text) });
@@ -4607,7 +4612,9 @@ async function kbLoad(){
   if(KB.cards) return KB;
   return KB.loading ||= (async () => {
     const v = typeof APP_VER !== 'undefined' ? APP_VER : Date.now();
-    const [md, rt] = await Promise.all([fetch(KB_URL + '?v=' + v, {cache:'no-cache'}).then(r => r.ok ? r.text() : Promise.reject(new Error('Довідник не завантажився'))),
+    const fromGit = () => fetch(KB_URL + '?v=' + v, {cache:'no-cache'}).then(r => r.ok ? r.text() : Promise.reject(new Error('Довідник не завантажився')));
+    const fromDoc = () => fetch(KB_GS + '?action=kb').then(r => r.json()).then(j => j.ok && j.md ? (KB.src = 'doc', j.md) : fromGit()).catch(fromGit);
+    const [md, rt] = await Promise.all([KB_GS ? fromDoc() : fromGit(),
       fetch(KB_ROUTES + '?v=' + v, {cache:'no-cache'}).then(r => r.ok ? r.json() : null).catch(() => null)]);
     KB.cards = parseKB(md); KB.ver = String(md.length) + ':' + v; index(KB.cards);
     if(rt){ KB.zones = rt.zones; KB.routesUpd = rt.updated; KB.zskel = Object.keys(rt.zones).map(z => [z, skel(z)]); }
@@ -4739,7 +4746,7 @@ function openKB(q0){
       <div class="kb-comp"><textarea id="kbQ" rows="1" placeholder="Запитайте своїми словами…"></textarea>
         <button class="ic ghost mic" data-mic="kbQ" aria-label="Голосом">${typeof MIC_SVG !== 'undefined' ? MIC_SVG : '🎤'}</button>
         <button class="ic btn" id="kbGo" aria-label="Надіслати"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div>
-      <div class="kb-foot"><span id="kbInfo">Відповідаю з довідника «Гарячої Точки» · MiniMax, temperature 0</span><button class="ghost" id="kbNew">Новий діалог</button></div>
+      <div class="kb-foot"><span id="kbInfo">${KB_GS ? 'Відповідаю з Google Doc «Довідник ГТ» · Gemini, безкоштовно, temperature 0' : 'Відповідаю з довідника «Гарячої Точки» · MiniMax, temperature 0'}</span>${NOTEBOOK_URL ? `<a class="btn ghost" href="${NOTEBOOK_URL}" target="_blank" rel="noopener">Відкрити в NotebookLM</a>` : ''}${isStaffNow() ? `<a class="ghost" href="${KB_DOC_URL}" target="_blank" rel="noopener" style="font-size:12.5px;white-space:nowrap">Редагувати базу</a>` : ''}<button class="ghost" id="kbNew">Новий діалог</button></div>
     </div><aside class="kb-src" id="kbSrc"></aside></div>`);
   box.querySelector('[data-back]').onclick = navBack;
   const inp = $('kbQ'), feed = $('kbFeed');
@@ -4795,8 +4802,14 @@ function openKB(q0){
       const cards = kbSources(q, hist), key = 'kbA:' + KB.ver + ':' + skel(q) + ':' + (isStaffNow() ? 's' : 'c') + ':' + route;
       let text = !hist.length ? ls.get(key) : null;
       if(!text){
-        const d = await claude([{ role:'user', content:kbPrompt(q, cards, route, hist) }], { max_tokens:1500, temperature:0, reasoning:'low' });
-        text = (typeof textOf === 'function' ? textOf(d) : '').replace(/<think>[\s\S]*?<\/think>/g, '').trim() || 'У довіднику цього ще нема.';
+        if(KB_GS){
+          const res = await fetch(KB_GS, { method:'POST', body:JSON.stringify({ action:'ask', q, history:hist.slice(-6).map(m => ({ role:m.role, text:m.text })), staff:isStaffNow(), route, name:S.me?.name || '' }) }).then(r => r.json());
+          if(!res.ok) throw new Error(res.error || 'Довідник не відповів');
+          text = res.text; KB.model = res.model;
+        } else {
+          const d = await claude([{ role:'user', content:kbPrompt(q, cards, route, hist) }], { max_tokens:1500, temperature:0, reasoning:'low' });
+          text = (typeof textOf === 'function' ? textOf(d) : '').replace(/<think>[\s\S]*?<\/think>/g, '').trim() || 'У довіднику цього ще нема.';
+        }
         if(!hist.length) ls.set(key, text);
       }
       Object.assign(w, { typing:false, text, route:r?.zone ? r.text : '' });
